@@ -1,6 +1,6 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
+
 const multer = require('multer');
 require('dotenv').config();
 
@@ -12,26 +12,32 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
     'https://resumate-create.vercel.app',
-    'https://resumate-create-git-main-tejeducation081-stars-projects.vercel.app' // Vercel preview branch support
+    'https://resumate-create-git-main-tejeducation081-stars-projects.vercel.app'
 ];
 
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.error('CORS blocked for:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-};
+// Manual CORS & Preflight Implementation (More robust for various cloud environments)
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+
+    // Check if origin is allowed or if it's a Vercel preview URL
+    const isAllowed = allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'));
+
+    if (isAllowed) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
+    // Handle Preflight
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24h
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 
 
 
