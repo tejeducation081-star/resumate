@@ -95,7 +95,7 @@ const Dashboard = ({ setView }) => {
                             key={idx}
                             whileHover={{ y: -8, background: 'rgba(255, 255, 255, 0.9)' }}
                             className="glass-panel"
-                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)' }}
+                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)', height: '100%' }}
                         >
                             <div className="flex-between">
                                 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</span>
@@ -104,7 +104,7 @@ const Dashboard = ({ setView }) => {
                                 </div>
                             </div>
                             <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1 }}>{stat.value}</div>
-                            <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', marginTop: 'auto' }}>
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: '70%' }}
@@ -118,16 +118,24 @@ const Dashboard = ({ setView }) => {
                     <motion.div
                         whileHover={{ y: -8, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
                         className="glass-panel"
-                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px' }}
+                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '100%' }}
                     >
-                        <h4 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem' }}>Scale Operations</h4>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>Unlock infinite architectures and elite neuro-templates.</p>
-                        <button className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '0.9rem', width: 'fit-content', margin: '0 auto' }}>UPGRADE TO PRO</button>
+                        <div className="flex-between">
+                            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Expansion</span>
+                            <div style={{ padding: '10px', borderRadius: '12px', background: 'var(--accent)15', color: 'var(--accent)' }}>
+                                <Zap size={24} />
+                            </div>
+                        </div>
+                        <h4 style={{ fontSize: '1.3rem', fontWeight: 800, textAlign: 'left' }}>Scale Operations</h4>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', textAlign: 'left', marginBottom: '1rem' }}>Unlock infinite architectures and elite templates.</p>
+                        <button className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '0.9rem', width: '100%', marginTop: 'auto' }}>UPGRADE TO PRO</button>
                     </motion.div>
                 </div>
 
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) 350px', gap: '4rem' }}>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) 350px', gap: '4rem', alignItems: 'start' }}>
+
 
                     <div>
                         {/* Search & Filter */}
