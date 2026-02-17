@@ -49,30 +49,7 @@ const AuthPage = ({ setView }) => {
                 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '3rem', position: 'relative' }}>
-                    <button
-                        onClick={() => setView('landing')}
-                        style={{
-                            position: 'absolute',
-                            left: '0',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--fg-muted)',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '0.8rem',
-                            fontWeight: 600,
-                            padding: '4px',
-                            transition: 'color 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--fg)'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--fg-muted)'}
-                    >
-                        <ArrowLeft size={16} /> Back
-                    </button>
+
 
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                         <ResumeLogo size={56} />
