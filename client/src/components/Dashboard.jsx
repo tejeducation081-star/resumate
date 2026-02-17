@@ -43,9 +43,9 @@ const Dashboard = ({ setView }) => {
             value: resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) + '%' : '0%',
             icon: TrendingUp,
             color: '#10B981'
-        },
-        { label: 'Market Reach', value: 'High', icon: Briefcase, color: '#A855F7' }
+        }
     ];
+
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--fg)', position: 'relative', overflowX: 'hidden' }}>
@@ -89,7 +89,7 @@ const Dashboard = ({ setView }) => {
                 </header>
 
                 {/* Intelligence Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
                     {stats.map((stat, idx) => (
                         <motion.div
                             key={idx}
@@ -113,7 +113,19 @@ const Dashboard = ({ setView }) => {
                             </div>
                         </motion.div>
                     ))}
+
+                    {/* Scale Operations Card */}
+                    <motion.div
+                        whileHover={{ y: -8, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
+                        className="glass-panel"
+                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px' }}
+                    >
+                        <h4 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem' }}>Scale Operations</h4>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>Unlock infinite architectures and elite neuro-templates.</p>
+                        <button className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '0.9rem', width: 'fit-content', margin: '0 auto' }}>UPGRADE TO PRO</button>
+                    </motion.div>
                 </div>
+
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) 350px', gap: '4rem' }}>
 
@@ -262,12 +274,7 @@ const Dashboard = ({ setView }) => {
                             </div>
                         </div>
 
-                        {/* Pro Expansion */}
-                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px', textAlign: 'center', border: '2px solid var(--accent)' }}>
-                            <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem' }}>Scale Operations</h4>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>Unlock infinite architectures and elite neuro-templates.</p>
-                            <button className="btn-primary" style={{ width: '100%', padding: '1rem' }}>UPGRADE TO PRO</button>
-                        </div>
+
 
                     </aside>
                 </div>
