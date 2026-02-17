@@ -4,6 +4,8 @@ import useAuthStore from '../store/authStore';
 import { Plus, Search, FileText, Zap, TrendingUp, Briefcase, Trash2, Layout, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TemplatePreview from './TemplatePreview';
+import { calculateATSScore } from '../utils/atsAnalyzer';
+
 
 const Dashboard = ({ setView }) => {
     const { resumes, fetchResumes, setCurrentResume, deleteResume } = useResumeStore();
@@ -112,9 +114,17 @@ const Dashboard = ({ setView }) => {
                             <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-muted)' }}>Top Optimization</span>
                             <TrendingUp size={20} color="#4ade80" />
                         </div>
-                        <div style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1, color: '#4ade80' }}>
-                            {resumes.length > 0 ? Math.max(...resumes.map(r => r.atsScore || 0)) : '0'}%
-                        </div>
+                        {(() => {
+                            const topScore = resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0;
+                            const color = topScore >= 80 ? '#10B981' : topScore >= 50 ? '#F59E0B' : '#EF4444';
+                            return (
+                                <div style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1, color }}>
+                                    {topScore}%
+                                </div>
+                            );
+                        })()}
+
+
                     </motion.div>
                 </div>
 
@@ -176,57 +186,66 @@ const Dashboard = ({ setView }) => {
                                         <div style={{ padding: '1.5rem' }}>
                                             <div className="flex-between" style={{ alignItems: 'flex-start', marginBottom: '1rem' }}>
                                                 <div>
-                                                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.2rem' }}>
-                                                        {resume.personalDetails.fullName || 'Untitled'}
-                                                    </h3>
-                                                    <span style={{ fontSize: '0.8rem', color: 'var(--fg-muted)' }}>Modified recently</span>
-                                                </div>
-                                                {resume.atsScore > 0 && (
-                                                    <div style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', fontSize: '0.8rem', fontWeight: 600 }}>
-                                                        {resume.atsScore}%
-                                                    </div>
-                                                )}
-                                            </div>
+                                                    {(() => {
+                                                        const { score } = calculateATSScore(resume);
+                                                        const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
+                                                        return score > 0 && (
+                                                            <div style={{
+                                                                padding: '4px 8px',
+                                                                borderRadius: '6px',
+                                                                background: `${color}15`,
+                                                                color: color,
+                                                                fontSize: '0.85rem',
+                                                                fontWeight: 700,
+                                                                border: `1px solid ${color}30`
+                                                            }}>
+                                                                {score}%
+                                                            </div>
+                                                        );
+                                                    })()}
 
-                                            {/* Actions */}
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px' }}>
-                                                <button className="glass-pill" style={{ fontSize: '0.9rem', justifyContent: 'center' }}>Edit</button>
-                                                <button
-                                                    className="glass-pill"
-                                                    style={{ fontSize: '0.9rem', justifyContent: 'center', background: 'var(--bg-soft)' }}
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation();
-                                                        // PDF Generation Logic (Same as before)
-                                                        const response = await fetch('http://localhost:5000/api/pdf/generate-pdf', {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({
-                                                                htmlContent: document.getElementById(`resume-render-${resume.id}`).innerHTML,
-                                                                styles: `#resume-preview { width: 210mm; min-height: 297mm; background: white !important; padding: 40px !important; }`
-                                                            })
-                                                        });
-                                                        const blob = await response.blob();
-                                                        const url = URL.createObjectURL(blob);
-                                                        const a = document.createElement('a');
-                                                        a.href = url;
-                                                        a.download = `${resume.personalDetails.fullName}.pdf`;
-                                                        a.click();
-                                                    }}
-                                                >
-                                                    PDF
-                                                </button>
-                                                <button
-                                                    className="glass-pill"
-                                                    style={{ padding: '0.5rem', color: '#ef4444' }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (window.confirm('Delete this resume?')) deleteResume(resume.id);
-                                                    }}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
+
+                                                </div>
+
+                                                {/* Actions */}
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px' }}>
+                                                    <button className="glass-pill" style={{ fontSize: '0.9rem', justifyContent: 'center' }}>Edit</button>
+                                                    <button
+                                                        className="glass-pill"
+                                                        style={{ fontSize: '0.9rem', justifyContent: 'center', background: 'var(--bg-soft)' }}
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation();
+                                                            // PDF Generation Logic (Same as before)
+                                                            const response = await fetch('http://localhost:5000/api/pdf/generate-pdf', {
+                                                                method: 'POST',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({
+                                                                    htmlContent: document.getElementById(`resume-render-${resume.id}`).innerHTML,
+                                                                    styles: `#resume-preview { width: 210mm; min-height: 297mm; background: white !important; padding: 40px !important; }`
+                                                                })
+                                                            });
+                                                            const blob = await response.blob();
+                                                            const url = URL.createObjectURL(blob);
+                                                            const a = document.createElement('a');
+                                                            a.href = url;
+                                                            a.download = `${resume.personalDetails.fullName}.pdf`;
+                                                            a.click();
+                                                        }}
+                                                    >
+                                                        PDF
+                                                    </button>
+                                                    <button
+                                                        className="glass-pill"
+                                                        style={{ padding: '0.5rem', color: '#ef4444' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (window.confirm('Delete this resume?')) deleteResume(resume.id);
+                                                        }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
                                     </motion.div>
                                 )) : (
                                     <div className="glass-panel" style={{ gridColumn: '1/-1', padding: '4rem', textAlign: 'center', color: 'var(--fg-muted)' }}>
