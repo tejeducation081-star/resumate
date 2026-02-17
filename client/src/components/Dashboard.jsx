@@ -19,6 +19,23 @@ const Dashboard = ({ setView }) => {
         return () => clearInterval(timer);
     }, [fetchResumes]);
 
+    const getTimeAgo = (dateString) => {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'Just now';
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}h ago`;
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) return `${diffInDays}d ago`;
+        return date.toLocaleDateString();
+    };
+
+
     const filteredResumes = (resumes || []).filter(r =>
         (r.personalDetails?.fullName || 'Untitled').toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -139,8 +156,8 @@ const Dashboard = ({ setView }) => {
 
                     <div>
                         {/* Search & Filter */}
-                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem' }}>
-                            <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRadius: '20px' }}>
+                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem', height: '60px' }}>
+                            <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRadius: '16px' }}>
                                 <Search size={20} color="var(--fg-muted)" />
                                 <input
                                     placeholder="Index search for archives..."
@@ -150,17 +167,18 @@ const Dashboard = ({ setView }) => {
                                         background: 'transparent',
                                         border: 'none',
                                         color: 'var(--fg)',
-                                        fontSize: '1.1rem',
-                                        padding: '1.2rem 1rem',
+                                        fontSize: '1rem',
+                                        padding: '0 1rem',
                                         width: '100%',
                                         outline: 'none'
                                     }}
                                 />
                             </div>
-                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '20px', fontWeight: 600, color: 'var(--fg-muted)' }}>
-                                Filters
+                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '16px', fontWeight: 600, color: 'var(--fg-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>Filters</span>
                             </button>
                         </div>
+
 
                         {/* Resume Pipeline */}
                         <div className="flex-between" style={{ marginBottom: '2rem' }}>
@@ -197,7 +215,8 @@ const Dashboard = ({ setView }) => {
                                                 <div>
                                                     <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.3rem' }}>{resume.personalDetails?.fullName || 'Untitled'}</h3>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <span style={{ fontSize: '0.85rem', color: 'var(--fg-muted)' }}>Updated 2h ago</span>
+                                                        <span style={{ fontSize: '0.85rem', color: 'var(--fg-muted)' }}>Updated {getTimeAgo(resume.updated_at || resume.updatedAt || resume.createdAt)}</span>
+
                                                         {(() => {
                                                             const { score } = calculateATSScore(resume);
                                                             const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
@@ -212,17 +231,18 @@ const Dashboard = ({ setView }) => {
                                                 <MoreVertical size={20} color="var(--fg-muted)" />
                                             </div>
 
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px' }}>
-                                                <button className="btn-primary" style={{ padding: '10px', fontSize: '0.9rem', background: 'var(--bg-soft)', color: 'var(--fg)', border: '1px solid var(--border)' }}>Edit Card</button>
-                                                <button className="btn-primary" style={{ padding: '10px', fontSize: '0.9rem' }}>Export PDF</button>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px' }}>
+                                                <button className="btn-primary" style={{ padding: '8px 4px', fontSize: '0.85rem', background: 'var(--bg-soft)', color: 'var(--fg)', border: '1px solid var(--border)', borderRadius: '8px' }}>Edit Card</button>
+                                                <button className="btn-primary" style={{ padding: '8px 4px', fontSize: '0.85rem', borderRadius: '8px' }}>Export PDF</button>
                                                 <button
                                                     className="glass-panel"
-                                                    style={{ padding: '0 12px', color: '#ef4444', borderRadius: '12px' }}
+                                                    style={{ padding: '0 8px', color: '#ef4444', borderRadius: '8px' }}
                                                     onClick={(e) => { e.stopPropagation(); if (window.confirm('Erase this architecture?')) deleteResume(resume.id); }}
                                                 >
-                                                    <Trash2 size={18} />
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
+
                                         </div>
                                     </motion.div>
                                 )) : (
@@ -240,24 +260,25 @@ const Dashboard = ({ setView }) => {
                     <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                         {/* Intelligence Card */}
-                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px', background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)', color: 'white' }}>
-                            <Zap size={32} style={{ marginBottom: '1.5rem' }} />
-                            <h4 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1rem' }}>AI Intelligence</h4>
-                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: 1.6, marginBottom: '2rem' }}>
+                        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)', color: 'white' }}>
+
+                            <Zap size={28} style={{ marginBottom: '1rem' }} />
+                            <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.8rem', color: 'white' }}>AI Intelligence</h4>
+                            <p style={{ fontSize: '0.9rem', opacity: 0.9, lineHeight: 1.5, marginBottom: '1.5rem', color: 'white' }}>
                                 {(() => {
                                     const topScore = resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0;
                                     return `Our neural network analyzed your highest score (${topScore}%). You're ${Math.max(0, topScore - 60)}% above the industry average.`;
                                 })()}
                             </p>
-                            <button style={{ width: '100%', padding: '1rem', borderRadius: '16px', border: 'none', background: 'white', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}>
+                            <button style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: 'none', background: 'white', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}>
                                 VIEW INSIGHTS
                             </button>
                         </div>
 
-
                         {/* System Tools */}
-                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px' }}>
-                            <h4 style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '2rem', fontWeight: 700 }}>Commander Tools</h4>
+                        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px' }}>
+                            <h4 style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.5rem', fontWeight: 700 }}>Commander Tools</h4>
+
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                                 <div className="flex-between" style={{ cursor: 'pointer' }}>
                                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
