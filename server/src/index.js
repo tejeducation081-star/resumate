@@ -51,17 +51,9 @@ app.get('/', (req, res) => {
     res.json({ message: 'Resume Builder API v1.0', status: 'running' });
 });
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, '../public/uploads');
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
-    }
-});
+// Multer Storage Configuration (In-Memory for Supabase Upload)
+const storage = multer.memoryStorage();
+
 
 const upload = multer({
     storage,
@@ -76,18 +68,40 @@ const upload = multer({
     }
 });
 
-// Static Files
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+const supabase = require('./config/supabase');
+// Removed local static file serving for uploads as we migrate to Supabase Storage
 
-// Upload Endpoint
-app.post('/api/upload', upload.single('image'), (req, res) => {
+
+// Upload Endpoint (Supabase Storage)
+app.post('/api/upload', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
-        const imageUrl = `${process.env.SERVER_URL || `http://localhost:${PORT}`}/uploads/${req.file.filename}`;
-        res.json({ imageUrl });
+
+        const fileName = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('resumes')
+            .upload(fileName, req.file.buffer, {
+                contentType: req.file.mimetype,
+                upsert: false
+            });
+
+        if (error) {
+            console.error('Supabase Storage Error:', error);
+            return res.status(500).json({ error: `Storage upload failed: ${error.message}` });
+        }
+
+        // Get Public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('resumes')
+            .getPublicUrl(fileName);
+
+        res.json({ imageUrl: publicUrl });
     } catch (err) {
+        console.error('Upload catch error:', err);
         res.status(500).json({ error: err.message });
     }
 });
