@@ -104,15 +104,15 @@ const Dashboard = ({ setView }) => {
                             key={idx}
                             whileHover={{ y: -8, background: 'rgba(255, 255, 255, 0.9)' }}
                             className="glass-panel"
-                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)', height: '240px' }}
+                            style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--border)', height: '210px' }}
                         >
                             <div className="flex-between">
-                                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</span>
-                                <div style={{ padding: '10px', borderRadius: '12px', background: `${stat.color}15`, color: stat.color }}>
-                                    <stat.icon size={24} />
+                                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</span>
+                                <div style={{ padding: '8px', borderRadius: '10px', background: `${stat.color}15`, color: stat.color }}>
+                                    <stat.icon size={20} />
                                 </div>
                             </div>
-                            <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1 }}>{stat.value}</div>
+                            <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1, margin: '0.5rem 0' }}>{stat.value}</div>
                             <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', marginTop: 'auto' }}>
                                 <motion.div
                                     initial={{ width: 0 }}
@@ -127,20 +127,20 @@ const Dashboard = ({ setView }) => {
                     <motion.div
                         whileHover={{ y: -8, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
                         className="glass-panel"
-                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '240px' }}
+                        style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', textAlign: 'center', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '210px' }}
                     >
-                        <div className="flex-between">
-                            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Expansion</span>
-                            <div style={{ padding: '10px', borderRadius: '12px', background: 'var(--accent)15', color: 'var(--accent)' }}>
-                                <Zap size={24} />
-                            </div>
+                        <div className="flex-between" style={{ marginBottom: '0.5rem' }}>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Expansion</span>
+                            <Zap size={20} color="var(--accent)" />
                         </div>
-                        <h4 style={{ fontSize: '1.3rem', fontWeight: 800, textAlign: 'left' }}>Scale Operations</h4>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', textAlign: 'left', marginBottom: '0.5rem' }}>Unlock infinite architectures and elite templates.</p>
-
-                        <button className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '0.9rem', width: '100%', marginTop: 'auto' }}>UPGRADE TO PRO</button>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <h4 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.4rem' }}>Scale Operations</h4>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--fg-muted)', maxWidth: '240px', margin: '0 auto' }}>Unlock infinite architectures and elite templates.</p>
+                        </div>
+                        <button className="btn-primary" style={{ padding: '0.7rem', fontSize: '0.85rem', width: '100%', marginTop: '0.5rem' }}>UPGRADE TO PRO</button>
                     </motion.div>
                 </div>
+
 
 
 
@@ -148,48 +148,50 @@ const Dashboard = ({ setView }) => {
 
 
                     <div>
-                        {/* Search, Filter & New Architecture Box */}
-                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem', height: '64px' }}>
-                            <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRadius: '16px' }}>
-                                <Search size={20} color="var(--fg-muted)" />
+                        {/* Search, Filter & New Architecture Box Row */}
+                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem', height: '56px' }}>
+                            <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.25rem', borderRadius: '14px' }}>
+                                <Search size={18} color="var(--fg-muted)" />
                                 <input
-                                    placeholder="Index search for archives..."
+                                    placeholder="Search archives..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{
                                         background: 'transparent',
                                         border: 'none',
                                         color: 'var(--fg)',
-                                        fontSize: '1rem',
-                                        padding: '0 1rem',
+                                        fontSize: '0.95rem',
+                                        padding: '0 0.75rem',
                                         width: '100%',
                                         outline: 'none'
                                     }}
                                 />
                             </div>
-                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '16px', fontWeight: 600, color: 'var(--fg-muted)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                            <button className="glass-panel" style={{ padding: '0 1.25rem', borderRadius: '14px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--fg-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <span>Filters</span>
                             </button>
                             <motion.button
-                                whileHover={{ scale: 1.02, boxShadow: '0 10px 30px -10px var(--accent-glow)' }}
+                                whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setView('templates')}
                                 className="btn-primary"
                                 style={{
-                                    padding: '0 2rem',
-                                    borderRadius: '16px',
+                                    padding: '0 1.5rem',
+                                    borderRadius: '14px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '12px',
+                                    gap: '10px',
                                     fontWeight: 700,
+                                    fontSize: '0.9rem',
                                     height: '100%',
                                     whiteSpace: 'nowrap'
                                 }}
                             >
-                                <Plus size={20} strokeWidth={3} />
+                                <Plus size={18} strokeWidth={3} />
                                 NEW ARCHITECTURE
                             </motion.button>
                         </div>
+
 
 
                         {/* Resume Pipeline Header */}
