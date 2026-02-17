@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import useResumeStore from '../store/resumeStore';
 import useAuthStore from '../store/authStore';
-import { Plus, Search, FileText, Zap, TrendingUp, Briefcase, Trash2, Layout, MoreVertical } from 'lucide-react';
+import { Plus, Search, FileText, Zap, TrendingUp, Briefcase, Trash2, Layout, MoreVertical, ExternalLink, Globe } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import TemplatePreview from './TemplatePreview';
 import { calculateATSScore } from '../utils/atsAnalyzer';
@@ -231,7 +232,7 @@ const Dashboard = ({ setView }) => {
                                                 <MoreVertical size={20} color="var(--fg-muted)" />
                                             </div>
 
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px' }}>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px', marginBottom: '8px' }}>
                                                 <button className="btn-primary" style={{ padding: '8px 4px', fontSize: '0.85rem', background: 'var(--bg-soft)', color: 'var(--fg)', border: '1px solid var(--border)', borderRadius: '8px' }}>Edit Card</button>
                                                 <button className="btn-primary" style={{ padding: '8px 4px', fontSize: '0.85rem', borderRadius: '8px' }}>Export PDF</button>
                                                 <button
@@ -242,6 +243,53 @@ const Dashboard = ({ setView }) => {
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
+
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05, boxShadow: '0 5px 15px rgba(0, 66, 154, 0.4)' }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="btn-primary"
+                                                    style={{
+                                                        padding: '10px',
+                                                        fontSize: '0.75rem',
+                                                        background: 'linear-gradient(135deg, #00429a 0%, #002b66 100%)',
+                                                        color: 'white',
+                                                        borderRadius: '12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '8px',
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        fontWeight: 700
+                                                    }}
+                                                    onClick={(e) => { e.stopPropagation(); window.open('https://www.naukri.com/mnjuser/homepage', '_blank'); }}
+                                                >
+                                                    <Globe size={14} /> Naukri
+                                                </motion.button>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05, boxShadow: '0 5px 15px rgba(37, 87, 167, 0.4)' }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="btn-primary"
+                                                    style={{
+                                                        padding: '10px',
+                                                        fontSize: '0.75rem',
+                                                        background: 'linear-gradient(135deg, #2557a7 0%, #173d7a 100%)',
+                                                        color: 'white',
+                                                        borderRadius: '12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '8px',
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        fontWeight: 700
+                                                    }}
+                                                    onClick={(e) => { e.stopPropagation(); window.open('https://profiles.indeed.com/', '_blank'); }}
+                                                >
+                                                    <ExternalLink size={14} /> Indeed
+                                                </motion.button>
+                                            </div>
+
+
 
                                         </div>
                                     </motion.div>
