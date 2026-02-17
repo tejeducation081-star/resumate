@@ -15,28 +15,34 @@ const allowedOrigins = [
     'https://resumate-create-git-main-tejeducation081-stars-projects.vercel.app'
 ];
 
-// Manual CORS & Preflight Implementation (More robust for various cloud environments)
+// Super-Robust CORS & Preflight Implementation
 app.use((req, res, next) => {
     const origin = req.headers.origin;
 
+    // Log for debugging in production logs
+    if (origin) console.log(`[CORS Request] Method: ${req.method}, Origin: ${origin}`);
 
-    // Check if origin is allowed or if it's a Vercel preview URL
-    const isAllowed = allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'));
+    const isAllowed = !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1');
 
-    if (isAllowed) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    if (isAllowed && origin) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, cache-control');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Max-Age', '86400');
     }
 
-    // Handle Preflight
+    // Immediate response for Preflight OPTIONS
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24h
-        return res.sendStatus(200);
+        return res.status(200).end();
     }
     next();
 });
+
 
 
 
