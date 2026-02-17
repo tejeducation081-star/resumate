@@ -84,13 +84,19 @@ const ResumeForm = ({ setView }) => {
         method: 'POST',
         body: data,
       });
-      if (!response.ok) throw new Error('Upload failed');
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
       const result = await response.json();
       updatePersonal('photoUrl', result.imageUrl);
     } catch (err) {
-      console.error('Upload failed:', err);
-      alert('Failed to upload image. Please try again.');
+      console.error('Detailed Upload failed:', err);
+      alert(`Failed to upload image: ${err.message}`);
     }
+
   };
 
   return (

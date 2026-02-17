@@ -82,12 +82,15 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         const fileName = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9.]/g, '_')}`;
 
         // Upload to Supabase Storage
+        console.log(`Starting upload for file: ${fileName}, size: ${req.file.size} bytes`);
         const { data, error } = await supabase.storage
             .from('resumes')
             .upload(fileName, req.file.buffer, {
                 contentType: req.file.mimetype,
+                cacheControl: '3600',
                 upsert: false
             });
+
 
         if (error) {
             console.error('Supabase Storage Error:', error);
@@ -102,8 +105,12 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         res.json({ imageUrl: publicUrl });
     } catch (err) {
         console.error('Upload catch error:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            error: err.message,
+            stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+        });
     }
+
 });
 
 // API Routes
