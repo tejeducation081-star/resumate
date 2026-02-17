@@ -250,7 +250,6 @@ const LandingPage = ({ setView }) => {
                                 whileHover={{ y: -10 }}
                                 style={{
                                     background: 'var(--surface)',
-                                    border: '1px solid var(--border)',
                                     border: i % 3 === 2 ? '1px solid var(--border)' : 'none',
                                     borderRadius: '16px',
                                     overflow: 'hidden',
