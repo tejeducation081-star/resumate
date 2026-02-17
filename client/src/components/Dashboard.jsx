@@ -93,27 +93,18 @@ const Dashboard = ({ setView }) => {
                                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} — System Status: <span style={{ color: '#10B981' }}>Optimized</span>
                             </p>
                         </motion.div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
-                            whileTap={{ scale: 0.98 }}
-                            className="btn-primary"
-                            onClick={() => { setCurrentResume(null); setView('templates'); }}
-                            style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem' }}
-                        >
-                            <Plus size={22} strokeWidth={2.5} /> Deploy New Architecture
-                        </motion.button>
                     </div>
                 </header>
 
+
                 {/* Intelligence Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', marginBottom: '4rem' }}>
                     {stats.map((stat, idx) => (
                         <motion.div
                             key={idx}
                             whileHover={{ y: -8, background: 'rgba(255, 255, 255, 0.9)' }}
                             className="glass-panel"
-                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)', height: '100%' }}
+                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)', height: '240px' }}
                         >
                             <div className="flex-between">
                                 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</span>
@@ -136,7 +127,7 @@ const Dashboard = ({ setView }) => {
                     <motion.div
                         whileHover={{ y: -8, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
                         className="glass-panel"
-                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '100%' }}
+                        style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '240px' }}
                     >
                         <div className="flex-between">
                             <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Expansion</span>
@@ -145,7 +136,8 @@ const Dashboard = ({ setView }) => {
                             </div>
                         </div>
                         <h4 style={{ fontSize: '1.3rem', fontWeight: 800, textAlign: 'left' }}>Scale Operations</h4>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', textAlign: 'left', marginBottom: '1rem' }}>Unlock infinite architectures and elite templates.</p>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', textAlign: 'left', marginBottom: '0.5rem' }}>Unlock infinite architectures and elite templates.</p>
+
                         <button className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '0.9rem', width: '100%', marginTop: 'auto' }}>UPGRADE TO PRO</button>
                     </motion.div>
                 </div>
@@ -156,8 +148,8 @@ const Dashboard = ({ setView }) => {
 
 
                     <div>
-                        {/* Search & Filter */}
-                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem', height: '60px' }}>
+                        {/* Search, Filter & New Architecture Box */}
+                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem', height: '64px' }}>
                             <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRadius: '16px' }}>
                                 <Search size={20} color="var(--fg-muted)" />
                                 <input
@@ -175,17 +167,35 @@ const Dashboard = ({ setView }) => {
                                     }}
                                 />
                             </div>
-                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '16px', fontWeight: 600, color: 'var(--fg-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '16px', fontWeight: 600, color: 'var(--fg-muted)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                                 <span>Filters</span>
                             </button>
+                            <motion.button
+                                whileHover={{ scale: 1.02, boxShadow: '0 10px 30px -10px var(--accent-glow)' }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setView('templates')}
+                                className="btn-primary"
+                                style={{
+                                    padding: '0 2rem',
+                                    borderRadius: '16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    fontWeight: 700,
+                                    height: '100%',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                <Plus size={20} strokeWidth={3} />
+                                NEW ARCHITECTURE
+                            </motion.button>
                         </div>
 
 
-                        {/* Resume Pipeline */}
-                        <div className="flex-between" style={{ marginBottom: '2rem' }}>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <Layout size={28} color="var(--accent)" /> Production Pipeline
-                            </h2>
+                        {/* Resume Pipeline Header */}
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Production Pipeline</h2>
+                            <p style={{ color: 'var(--fg-muted)', fontSize: '1rem' }}>{resumes.length} active architectures ready for deployment.</p>
                         </div>
 
                         <motion.div
