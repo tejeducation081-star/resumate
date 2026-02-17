@@ -186,26 +186,31 @@ const Dashboard = ({ setView }) => {
                                         <div style={{ padding: '1.5rem' }}>
                                             <div className="flex-between" style={{ alignItems: 'flex-start', marginBottom: '1rem' }}>
                                                 <div>
-                                                    {(() => {
-                                                        const { score } = calculateATSScore(resume);
-                                                        const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
-                                                        return score > 0 && (
-                                                            <div style={{
-                                                                padding: '4px 8px',
-                                                                borderRadius: '6px',
-                                                                background: `${color}15`,
-                                                                color: color,
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: 700,
-                                                                border: `1px solid ${color}30`
-                                                            }}>
-                                                                {score}%
-                                                            </div>
-                                                        );
-                                                    })()}
-
-
+                                                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.2rem' }}>
+                                                        {resume.personalDetails.fullName || 'Untitled'}
+                                                    </h3>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <span style={{ fontSize: '0.8rem', color: 'var(--fg-muted)' }}>Modified recently</span>
+                                                        {(() => {
+                                                            const { score } = calculateATSScore(resume);
+                                                            const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
+                                                            return score > 0 && (
+                                                                <div style={{
+                                                                    padding: '2px 6px',
+                                                                    borderRadius: '4px',
+                                                                    background: `${color}15`,
+                                                                    color: color,
+                                                                    fontSize: '0.75rem',
+                                                                    fontWeight: 700,
+                                                                    border: `1px solid ${color}30`
+                                                                }}>
+                                                                    {score}%
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </div>
                                                 </div>
+
 
                                                 {/* Actions */}
                                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px' }}>
