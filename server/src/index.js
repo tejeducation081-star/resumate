@@ -145,5 +145,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Resume Builder API running on port ${PORT}`);
     console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 CORS Origin: ${CLIENT_URL}\n`);
+    console.log(`🔗 CORS Origins: ${allowedOrigins.join(', ')}\n`);
 });
