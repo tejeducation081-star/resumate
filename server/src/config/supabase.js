@@ -7,21 +7,19 @@ const clean = (val) => val ? val.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '
 const supabaseUrl = clean(process.env.SUPABASE_URL);
 const supabaseKey = clean(process.env.SUPABASE_KEY);
 
+let supabase;
+
 if (!supabaseUrl || !supabaseKey) {
     const missing = [];
     if (!supabaseUrl) missing.push('SUPABASE_URL');
     if (!supabaseKey) missing.push('SUPABASE_KEY');
 
-    const errorMsg = `❌ SUPABASE CONFIG ERROR: Missing ${missing.join(' and ')} in environment variables.`;
-    console.error(errorMsg);
-
-    // Throw a more helpful error during startup
-    if (process.env.NODE_ENV === 'production') {
-        throw new Error(errorMsg);
-    }
+    console.error(`⚠️  WARNING: Supabase image uploads disabled. Missing ${missing.join(' and ')}.`);
+    supabase = null;
+} else {
+    supabase = createClient(supabaseUrl, supabaseKey);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = supabase;
 

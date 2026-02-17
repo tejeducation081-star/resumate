@@ -96,9 +96,17 @@ const supabase = require('./config/supabase');
 // Upload Endpoint (Supabase Storage)
 app.post('/api/upload', upload.single('image'), async (req, res) => {
     try {
+        if (!supabase) {
+            return res.status(503).json({
+                error: 'Upload feature is currently disabled.',
+                detail: 'SUPABASE_URL and SUPABASE_KEY are missing in server environment variables.'
+            });
+        }
+
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
+
 
         const fileName = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9.]/g, '_')}`;
 
