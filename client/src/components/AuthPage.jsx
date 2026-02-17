@@ -130,11 +130,15 @@ const AuthPage = ({ setView }) => {
                         />
                     </div>
 
-                    <button className="btn-primary" type="submit" disabled={loading} style={{ padding: '12px', marginTop: '1rem' }}>
+                    <button className="btn-primary" type="submit" disabled={loading} style={{ marginTop: '1rem', width: '100%' }}>
                         {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                            <> {isLogin ? 'Authorize' : 'Initialize Account'} <ArrowRight size={18} /> </>
+                            <>
+                                <span>{isLogin ? 'Authorize' : 'Initialize Account'}</span>
+                                <ArrowRight size={18} />
+                            </>
                         )}
                     </button>
+
                 </form>
 
                 <div style={{ marginTop: '2rem', textAlign: 'center' }}>
