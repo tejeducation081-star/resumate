@@ -94,7 +94,8 @@ const Navbar = ({ setView, currentView }) => {
                     maxWidth: '1400px',
                     pointerEvents: 'auto',
                     transition: 'all 0.4s ease',
-                    boxShadow: scrolled ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 4px 20px rgba(0,0,0,0.05)'
+                    boxShadow: scrolled ? 'var(--shadow-md)' : 'none'
+
                 }}
             >
                 {/* Logo Area */}
@@ -141,8 +142,9 @@ const Navbar = ({ setView, currentView }) => {
                             onMouseEnter={(e) => {
                                 if (currentView !== link.id) {
                                     e.currentTarget.style.color = 'var(--fg)';
-                                    e.currentTarget.style.background = 'rgba(0,0,0,0.05)';
+                                    e.currentTarget.style.background = 'var(--surface-highlight)';
                                 }
+
                             }}
                             onMouseLeave={(e) => {
                                 if (currentView !== link.id) {

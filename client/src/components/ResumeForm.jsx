@@ -107,7 +107,8 @@ const ResumeForm = ({ setView }) => {
     }}>
 
       {/* 1. Left Column: Form */}
-      <div style={{ padding: '0 0 2rem 0', overflowY: 'auto', background: 'white', borderRadius: '16px', border: '1px solid var(--border)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '0 0 2rem 0', overflowY: 'auto', background: 'var(--bg)', borderRadius: '16px', border: '1px solid var(--border)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+
         <div style={{ padding: '2rem' }}>
           <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -411,15 +412,16 @@ const ResumeForm = ({ setView }) => {
             bottom: '80px',
             right: '0',
             width: '350px',
-            background: 'white',
+            background: 'var(--bg)',
             borderRadius: '16px',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+            boxShadow: 'var(--shadow-md)',
             border: '1px solid var(--border)',
             padding: '1.5rem',
             maxHeight: '600px',
             overflowY: 'auto',
             animation: 'fadeInUp 0.3s ease forwards'
           }}>
+
             {(() => {
               const { score, feedback } = calculateATSScore(formData);
 

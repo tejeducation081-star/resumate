@@ -72,10 +72,11 @@ const LandingPage = ({ setView }) => {
                     transform: 'translate(-50%, -50%)',
                     width: '80vw',
                     height: '80vw',
-                    background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)',
                     filter: 'blur(100px)',
                     zIndex: 0
                 }}></div>
+
 
                 {/* Hero Content */}
                 <div className="container" style={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
@@ -179,10 +180,11 @@ const LandingPage = ({ setView }) => {
                                     <div key={idx} style={{
                                         width: idx === currentImage ? '24px' : '8px',
                                         height: '8px',
-                                        background: 'white',
+                                        background: 'var(--fg)',
                                         borderRadius: '4px',
                                         opacity: idx === currentImage ? 1 : 0.3,
                                         transition: 'all 0.3s'
+
                                     }} />
                                 ))}
                             </div>
@@ -314,7 +316,8 @@ const LandingPage = ({ setView }) => {
 
             {/* CALL TO ACTION */}
             <section style={{ padding: '10rem 0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, rgba(99,102,241,0.2) 0%, transparent 60%)', pointerEvents: 'none' }}></div>
+                <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, var(--accent-glow) 0%, transparent 60%)', pointerEvents: 'none' }}></div>
+
 
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                     <h2 style={{ fontSize: '4rem', marginBottom: '2rem' }}>Ready to <span style={{ color: 'var(--accent)' }}>Ascend?</span></h2>

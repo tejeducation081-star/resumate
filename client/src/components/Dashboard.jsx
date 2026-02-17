@@ -109,7 +109,8 @@ const Dashboard = ({ setView }) => {
                     {stats.map((stat, idx) => (
                         <motion.div
                             key={idx}
-                            whileHover={{ y: -8, background: 'rgba(255, 255, 255, 0.9)' }}
+                            whileHover={{ y: -8, background: 'var(--surface-highlight)' }}
+
                             className="glass-panel"
                             style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid var(--border)', height: '210px' }}
                         >
@@ -132,9 +133,10 @@ const Dashboard = ({ setView }) => {
 
                     {/* Scale Operations Card */}
                     <motion.div
-                        whileHover={{ y: -8, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
+                        whileHover={{ y: -8, boxShadow: 'var(--shadow-glow)' }}
                         className="glass-panel"
-                        style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', textAlign: 'center', border: '2px solid var(--accent)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', height: '210px' }}
+                        style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', textAlign: 'center', border: '2px solid var(--accent)', background: 'var(--surface-highlight)', borderRadius: '24px', height: '210px' }}
+
                     >
                         <div className="flex-between" style={{ marginBottom: '0.5rem' }}>
                             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Expansion</span>
@@ -227,16 +229,18 @@ const Dashboard = ({ setView }) => {
                                     <motion.div
                                         key={resume.id}
                                         variants={itemVariants}
-                                        whileHover={{ y: -10, boxShadow: '0 30px 60px -15px rgba(0,0,0,0.1)' }}
+                                        whileHover={{ y: -10, boxShadow: 'var(--shadow-md)' }}
+
                                         className="glass-panel"
                                         style={{ padding: '0', overflow: 'hidden', cursor: 'pointer', borderRadius: '24px' }}
                                         onClick={() => { setCurrentResume(resume); setView('editor'); }}
                                     >
                                         <div style={{ height: '280px', background: 'var(--bg-soft)', position: 'relative', overflow: 'hidden' }}>
-                                            <div style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '210mm', position: 'absolute', top: '24px', left: '24px', background: 'white', boxShadow: '0 15px 45px rgba(0,0,0,0.1)' }}>
+                                            <div style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '210mm', position: 'absolute', top: '24px', left: '24px', background: 'white', boxShadow: '0 15px 45px rgba(0,0,0,0.2)' }}>
                                                 <TemplatePreview data={resume} />
                                             </div>
-                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--bg-soft) 0%, transparent 60%)' }}></div>
+                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--bg-soft) 0%, transparent 80%)' }}></div>
+
                                         </div>
 
                                         <div style={{ padding: '2rem' }}>
@@ -336,7 +340,8 @@ const Dashboard = ({ setView }) => {
                     <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                         {/* Intelligence Card */}
-                        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)', color: 'white' }}>
+                        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)', color: 'white', border: 'none' }}>
+
 
                             <Zap size={28} style={{ marginBottom: '1rem' }} />
                             <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.8rem', color: 'white' }}>AI Intelligence</h4>
@@ -346,7 +351,8 @@ const Dashboard = ({ setView }) => {
                                     return `Our neural network analyzed your highest score (${topScore}%). You're ${Math.max(0, topScore - 60)}% above the industry average.`;
                                 })()}
                             </p>
-                            <button style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: 'none', background: 'white', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}>
+                            <button style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: 'none', background: 'var(--bg)', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}>
+
                                 VIEW INSIGHTS
                             </button>
                         </div>

@@ -182,8 +182,9 @@ const SplashScreen = ({ onFinish }) => {
                             initial={{ width: 0, opacity: 0 }}
                             animate={{ width: '240px', opacity: 1 }}
                             transition={{ delay: 0.5 }}
-                            style={{ height: '4px', background: 'rgba(0,0,0,0.05)', borderRadius: '2px', overflow: 'hidden', position: 'relative' }}
+                            style={{ height: '4px', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', position: 'relative', border: '1px solid var(--border)' }}
                         >
+
                             <motion.div
                                 style={{
                                     height: '100%',

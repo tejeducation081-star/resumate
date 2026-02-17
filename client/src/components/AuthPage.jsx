@@ -41,12 +41,11 @@ const AuthPage = ({ setView }) => {
                 style={{
                     width: '100%',
                     maxWidth: '450px',
-                    background: 'white',
                     padding: '3rem',
                     borderRadius: '24px',
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.05)',
                     border: '1px solid var(--border)'
                 }}
+                className="glass-panel"
             >
                 <div style={{ textAlign: 'center', marginBottom: '3rem', position: 'relative' }}>
 
@@ -61,17 +60,19 @@ const AuthPage = ({ setView }) => {
 
                 {error && (
                     <div style={{
-                        background: '#fee2e2',
+                        background: 'rgba(239, 68, 68, 0.1)',
                         color: '#ef4444',
                         padding: '12px',
                         borderRadius: '8px',
                         marginBottom: '1.5rem',
                         fontSize: '0.9rem',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        border: '1px solid rgba(239, 68, 68, 0.2)'
                     }}>
                         {error}
                     </div>
                 )}
+
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {!isLogin && (
