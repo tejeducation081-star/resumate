@@ -251,6 +251,7 @@ const Dashboard = ({ setView }) => {
                                                     </button>
                                                 </div>
                                             </div>
+                                        </div>
                                     </motion.div>
                                 )) : (
                                     <div className="glass-panel" style={{ gridColumn: '1/-1', padding: '4rem', textAlign: 'center', color: 'var(--fg-muted)' }}>
