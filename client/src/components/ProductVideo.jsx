@@ -10,7 +10,8 @@ const ProductVideo = () => {
         <div style={{ width: '100%', height: '100%' }}>
             {/* Audio: Try to autoplay from a public domain source if local is missing, or placeholder */}
             {/* Using a generic placeholder. The user must provide the file. */}
-            <audio autoPlay loop muted={false} src="/background_music.mp3" />
+            {/* <audio autoPlay loop muted={false} src="/background_music.mp3" /> */}
+
 
             <div className="glass-panel" style={{
                 borderRadius: '24px',
