@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Sun, Moon } from 'lucide-react';
 import useAuthStore from '../store/authStore';
+
 import ResumeLogo from './ResumeLogo';
 
 const Navbar = ({ setView, currentView }) => {
     const [scrolled, setScrolled] = useState(false);
     const { user, logout } = useAuthStore();
 
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        return localStorage.getItem('theme') === 'dark';
+    });
+
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
+
+        // Apply theme
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        }
+
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isDarkMode]);
+
 
     const publicLinks = [
         { id: 'landing', label: 'Home' },
@@ -139,8 +156,35 @@ const Navbar = ({ setView, currentView }) => {
                     ))}
                 </div>
 
-                {/* Conditional Call to Action */}
-                <div style={{ marginLeft: '24px' }}>
+                {/* Action Area (Theme Toggle + CTA) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginLeft: '24px' }}>
+                    {/* Theme Toggle */}
+                    <button
+                        onClick={() => setIsDarkMode(!isDarkMode)}
+                        style={{
+                            background: 'transparent',
+                            border: '1px solid var(--border)',
+                            color: 'var(--fg)',
+                            padding: '10px',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--bg-soft)';
+                            e.currentTarget.style.borderColor = 'var(--accent)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderColor = 'var(--border)';
+                        }}
+                    >
+                        {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
+
                     {user ? (
                         <button
                             className="btn-secondary"
@@ -159,6 +203,7 @@ const Navbar = ({ setView, currentView }) => {
                         </button>
                     )}
                 </div>
+
             </div>
         </motion.nav>
     );
