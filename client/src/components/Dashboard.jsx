@@ -340,13 +340,16 @@ const Dashboard = ({ setView }) => {
                                         <div style={{ padding: '10px', background: 'var(--bg-soft)', borderRadius: '12px' }}><Zap size={20} color="#EAB308" /></div>
                                         <span style={{ fontWeight: 600 }}>Cover Letter AI</span>
                                     </div>
-                                    <span style={{ fontSize: '0.75rem', background: 'var(--accent)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>BETA</span>
+                                    <span style={{ fontSize: '0.65rem', background: 'var(--accent)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>UPCOMING</span>
+
                                 </div>
                                 <div className="flex-between" style={{ cursor: 'pointer' }}>
                                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                         <div style={{ padding: '10px', background: 'var(--bg-soft)', borderRadius: '12px' }}><TrendingUp size={20} color="#4ADE80" /></div>
                                         <span style={{ fontWeight: 600 }}>Market Analytics</span>
                                     </div>
+                                    <span style={{ fontSize: '0.65rem', background: 'var(--bg-soft)', color: 'var(--fg-muted)', padding: '2px 8px', borderRadius: '4px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid var(--border)' }}>UPCOMING</span>
+
                                 </div>
                             </div>
                         </div>
