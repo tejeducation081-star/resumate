@@ -55,12 +55,19 @@ const Dashboard = ({ setView }) => {
     };
 
     const stats = [
-        { label: 'Active Archives', value: resumes.length, icon: FileText, color: 'var(--accent)' },
+        {
+            label: 'Active Archives',
+            value: `${resumes.length}/2`,
+            icon: FileText,
+            color: 'var(--accent)',
+            progress: Math.min((resumes.length / 2) * 100, 100)
+        },
         {
             label: 'Peak Precision',
             value: resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) + '%' : '0%',
             icon: TrendingUp,
-            color: '#10B981'
+            color: '#10B981',
+            progress: resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0
         }
     ];
 
@@ -116,7 +123,7 @@ const Dashboard = ({ setView }) => {
                             <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', marginTop: 'auto' }}>
                                 <motion.div
                                     initial={{ width: 0 }}
-                                    animate={{ width: '70%' }}
+                                    animate={{ width: `${stat.progress}%` }}
                                     style={{ height: '100%', background: stat.color }}
                                 />
                             </div>
@@ -171,9 +178,14 @@ const Dashboard = ({ setView }) => {
                                 <span>Filters</span>
                             </button>
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => setView('templates')}
+                                onClick={() => {
+                                    if (resumes.length >= 2) {
+                                        alert("SYSTEM LIMIT REACHED: Free accounts are restricted to 2 active architectures. Please upgrade to Scale Operations to unlock infinite capacity.");
+                                    } else {
+                                        setView('templates');
+                                    }
+                                }}
                                 className="btn-primary"
                                 style={{
                                     padding: '0 1.5rem',
@@ -184,12 +196,16 @@ const Dashboard = ({ setView }) => {
                                     fontWeight: 700,
                                     fontSize: '0.9rem',
                                     height: '100%',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    opacity: resumes.length >= 2 ? 0.6 : 1,
+                                    cursor: resumes.length >= 2 ? 'not-allowed' : 'pointer',
+                                    background: resumes.length >= 2 ? 'var(--fg-muted)' : 'var(--accent)'
                                 }}
                             >
                                 <Plus size={18} strokeWidth={3} />
-                                NEW ARCHITECTURE
+                                {resumes.length >= 2 ? 'LIMIT REACHED' : 'NEW ARCHITECTURE'}
                             </motion.button>
+
                         </div>
 
 
