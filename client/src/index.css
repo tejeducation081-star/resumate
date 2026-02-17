@@ -113,6 +113,18 @@ h6 {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hover-glow:hover {
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  opacity: 1 !important;
+}
+
+
 /* Button Reset & Styles */
 button {
   font-family: var(--font-body);

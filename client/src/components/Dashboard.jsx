@@ -11,13 +11,16 @@ const Dashboard = ({ setView }) => {
     const { resumes, fetchResumes, setCurrentResume, deleteResume } = useResumeStore();
     const [searchQuery, setSearchQuery] = useState('');
     const { user } = useAuthStore();
+    const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
         fetchResumes();
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+        return () => clearInterval(timer);
     }, [fetchResumes]);
 
     const filteredResumes = (resumes || []).filter(r =>
-        (r.personalDetails.fullName || 'Untitled').toLowerCase().includes(searchQuery.toLowerCase())
+        (r.personalDetails?.fullName || 'Untitled').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const containerVariants = {
@@ -33,260 +36,240 @@ const Dashboard = ({ setView }) => {
         visible: { y: 0, opacity: 1 }
     };
 
+    const stats = [
+        { label: 'Active Archives', value: resumes.length, icon: FileText, color: 'var(--accent)' },
+        {
+            label: 'Peak Precision',
+            value: resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) + '%' : '0%',
+            icon: TrendingUp,
+            color: '#10B981'
+        },
+        { label: 'Market Reach', value: 'High', icon: Briefcase, color: '#A855F7' }
+    ];
+
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--fg)', position: 'relative', overflowX: 'hidden' }}>
-            {/* Background Ambience */}
-            <div className="mesh-gradient" style={{ position: 'fixed', inset: 0, opacity: 0.4, zIndex: 0 }}></div>
+            {/* Background Ambience - More Dynamic */}
+            <div style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%)',
+                zIndex: 0
+            }}></div>
 
-            <div className="container" style={{ position: 'relative', zIndex: 1, paddingTop: '120px', paddingBottom: '4rem' }}>
+            <div className="container" style={{ position: 'relative', zIndex: 1, paddingTop: '100px', paddingBottom: '4rem' }}>
 
-                {/* Header Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex-between"
-                    style={{ alignItems: 'flex-end', marginBottom: '4rem', flexWrap: 'wrap', gap: '2rem' }}
-                >
-                    <div>
-                        <h1 className="hero-title" style={{ fontSize: '4rem', marginBottom: '1rem', lineHeight: 1 }}>
-                            Welcome, {user?.user_metadata?.username || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
-                        </h1>
-                        <p style={{ fontSize: '1.2rem', color: 'var(--fg-muted)', maxWidth: '500px', marginBottom: '1rem' }}>
-                            manage your professional infrastructure.
-                        </p>
-                    </div>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="btn-primary"
-                        onClick={() => { setCurrentResume(null); setView('templates'); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-                    >
-                        <Plus size={20} /> New Architecture
-                    </motion.button>
-                </motion.div>
-
-                {/* Search & Stats Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '2rem', marginBottom: '4rem' }}>
-
-                    {/* Search Bar */}
-                    <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0 1.5rem' }}>
-                        <Search size={22} color="var(--fg-muted)" />
-                        <input
-                            placeholder="Search archives..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--fg)',
-                                fontSize: '1.2rem',
-                                padding: '1.5rem 1rem',
-                                width: '100%',
-                                outline: 'none',
-                                fontFamily: 'var(--font-body)'
-                            }}
-                        />
-                    </div>
-
-                    {/* Stat Card 1 */}
-                    <motion.div
-                        whileHover={{ y: -5 }}
-                        className="glass-panel"
-                        style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-                    >
-                        <div className="flex-between" style={{ marginBottom: '1rem' }}>
-                            <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-muted)' }}>Active Documents</span>
-                            <FileText size={20} color="var(--accent)" />
-                        </div>
-                        <div style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1 }}>
-                            {resumes.length || '0'}
-                        </div>
-                    </motion.div>
-
-                    {/* Stat Card 2 */}
-                    <motion.div
-                        whileHover={{ y: -5 }}
-                        className="glass-panel"
-                        style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-                    >
-                        <div className="flex-between" style={{ marginBottom: '1rem' }}>
-                            <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-muted)' }}>Top Optimization</span>
-                            <TrendingUp size={20} color="#4ade80" />
-                        </div>
-                        {(() => {
-                            const topScore = resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0;
-                            const color = topScore >= 80 ? '#10B981' : topScore >= 50 ? '#F59E0B' : '#EF4444';
-                            return (
-                                <div style={{ fontSize: '3rem', fontWeight: 700, lineHeight: 1, color }}>
-                                    {topScore}%
-                                </div>
-                            );
-                        })()}
-
-
-                    </motion.div>
+                {/* Top Navigation / Breadcrumb Look */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '2rem', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--fg-muted)' }}>
+                    <span style={{ color: 'var(--accent)' }}>System</span> / <span>Commander</span> / <span>Dashboard</span>
                 </div>
 
-                {/* Main Content Area */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) 300px', gap: '3rem' }}>
+                {/* Hero Header */}
+                <header style={{ marginBottom: '4rem' }}>
+                    <div className="flex-between" style={{ alignItems: 'flex-end', flexWrap: 'wrap', gap: '2rem' }}>
+                        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                            <h1 className="hero-title" style={{ fontSize: '3.5rem', marginBottom: '0.5rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                                Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.user_metadata?.username || user?.email?.split('@')[0] || 'Kirtan'}
+                            </h1>
+                            <p style={{ fontSize: '1.25rem', color: 'var(--fg-muted)', fontWeight: 500 }}>
+                                {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} — System Status: <span style={{ color: '#10B981' }}>Optimized</span>
+                            </p>
+                        </motion.div>
 
-                    {/* Resume Grid */}
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <div className="flex-between" style={{ marginBottom: '2rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Recent Projects</h2>
+                        <motion.button
+                            whileHover={{ scale: 1.02, boxShadow: '0 20px 40px -10px var(--accent-glow)' }}
+                            whileTap={{ scale: 0.98 }}
+                            className="btn-primary"
+                            onClick={() => { setCurrentResume(null); setView('templates'); }}
+                            style={{ padding: '1.2rem 2.5rem', fontSize: '1.1rem' }}
+                        >
+                            <Plus size={22} strokeWidth={2.5} /> Deploy New Architecture
+                        </motion.button>
+                    </div>
+                </header>
+
+                {/* Intelligence Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                    {stats.map((stat, idx) => (
+                        <motion.div
+                            key={idx}
+                            whileHover={{ y: -8, background: 'rgba(255, 255, 255, 0.9)' }}
+                            className="glass-panel"
+                            style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)' }}
+                        >
+                            <div className="flex-between">
+                                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</span>
+                                <div style={{ padding: '10px', borderRadius: '12px', background: `${stat.color}15`, color: stat.color }}>
+                                    <stat.icon size={24} />
+                                </div>
+                            </div>
+                            <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1 }}>{stat.value}</div>
+                            <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: '70%' }}
+                                    style={{ height: '100%', background: stat.color }}
+                                />
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) 350px', gap: '4rem' }}>
+
+                    <div>
+                        {/* Search & Filter */}
+                        <div style={{ marginBottom: '3rem', display: 'flex', gap: '1rem' }}>
+                            <div className="glass-panel" style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 1.5rem', borderRadius: '20px' }}>
+                                <Search size={20} color="var(--fg-muted)" />
+                                <input
+                                    placeholder="Index search for archives..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: 'var(--fg)',
+                                        fontSize: '1.1rem',
+                                        padding: '1.2rem 1rem',
+                                        width: '100%',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+                            <button className="glass-panel" style={{ padding: '0 1.5rem', borderRadius: '20px', fontWeight: 600, color: 'var(--fg-muted)' }}>
+                                Filters
+                            </button>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+                        {/* Resume Pipeline */}
+                        <div className="flex-between" style={{ marginBottom: '2rem' }}>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <Layout size={28} color="var(--accent)" /> Production Pipeline
+                            </h2>
+                        </div>
+
+                        <motion.div
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}
+                        >
                             <AnimatePresence>
                                 {filteredResumes.length > 0 ? filteredResumes.map((resume) => (
                                     <motion.div
                                         key={resume.id}
                                         variants={itemVariants}
-                                        whileHover={{ y: -10, boxShadow: '0 20px 40px -10px rgba(99,102,241,0.3)' }}
+                                        whileHover={{ y: -10, boxShadow: '0 30px 60px -15px rgba(0,0,0,0.1)' }}
                                         className="glass-panel"
-                                        style={{
-                                            padding: '0',
-                                            overflow: 'hidden',
-                                            position: 'relative',
-                                            cursor: 'pointer',
-                                            border: '1px solid var(--border)'
-                                        }}
+                                        style={{ padding: '0', overflow: 'hidden', cursor: 'pointer', borderRadius: '24px' }}
                                         onClick={() => { setCurrentResume(resume); setView('editor'); }}
                                     >
-                                        {/* Preview Window */}
-                                        <div style={{
-                                            height: '250px',
-                                            background: '#1e293b',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}>
-                                            {/* Mini Scaled Preview */}
-                                            <div style={{
-                                                transform: 'scale(0.25)',
-                                                transformOrigin: 'top left',
-                                                width: '210mm',
-                                                position: 'absolute',
-                                                top: '20px', left: '20px',
-                                                background: 'white',
-                                                boxShadow: '0 10px 50px rgba(0,0,0,0.5)'
-                                            }}>
+                                        <div style={{ height: '280px', background: 'var(--bg-soft)', position: 'relative', overflow: 'hidden' }}>
+                                            <div style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '210mm', position: 'absolute', top: '24px', left: '24px', background: 'white', boxShadow: '0 15px 45px rgba(0,0,0,0.1)' }}>
                                                 <TemplatePreview data={resume} />
                                             </div>
-
-                                            {/* Fade Overlay */}
-                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #1e293b 0%, transparent 50%)' }}></div>
+                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--bg-soft) 0%, transparent 60%)' }}></div>
                                         </div>
 
-                                        {/* Card Content */}
-                                        <div style={{ padding: '1.5rem' }}>
-                                            <div className="flex-between" style={{ alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                        <div style={{ padding: '2rem' }}>
+                                            <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
                                                 <div>
-                                                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.2rem' }}>
-                                                        {resume.personalDetails.fullName || 'Untitled'}
-                                                    </h3>
+                                                    <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.3rem' }}>{resume.personalDetails?.fullName || 'Untitled'}</h3>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <span style={{ fontSize: '0.8rem', color: 'var(--fg-muted)' }}>Modified recently</span>
+                                                        <span style={{ fontSize: '0.85rem', color: 'var(--fg-muted)' }}>Updated 2h ago</span>
                                                         {(() => {
                                                             const { score } = calculateATSScore(resume);
                                                             const color = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
                                                             return score > 0 && (
-                                                                <div style={{
-                                                                    padding: '2px 6px',
-                                                                    borderRadius: '4px',
-                                                                    background: `${color}15`,
-                                                                    color: color,
-                                                                    fontSize: '0.75rem',
-                                                                    fontWeight: 700,
-                                                                    border: `1px solid ${color}30`
-                                                                }}>
+                                                                <div style={{ padding: '2px 8px', borderRadius: '6px', background: `${color}15`, color, fontSize: '0.8rem', fontWeight: 700, border: `1px solid ${color}30` }}>
                                                                     {score}%
                                                                 </div>
                                                             );
                                                         })()}
                                                     </div>
                                                 </div>
+                                                <MoreVertical size={20} color="var(--fg-muted)" />
+                                            </div>
 
-
-                                                {/* Actions */}
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '10px' }}>
-                                                    <button className="glass-pill" style={{ fontSize: '0.9rem', justifyContent: 'center' }}>Edit</button>
-                                                    <button
-                                                        className="glass-pill"
-                                                        style={{ fontSize: '0.9rem', justifyContent: 'center', background: 'var(--bg-soft)' }}
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation();
-                                                            // PDF Generation Logic (Same as before)
-                                                            const response = await fetch('http://localhost:5000/api/pdf/generate-pdf', {
-                                                                method: 'POST',
-                                                                headers: { 'Content-Type': 'application/json' },
-                                                                body: JSON.stringify({
-                                                                    htmlContent: document.getElementById(`resume-render-${resume.id}`).innerHTML,
-                                                                    styles: `#resume-preview { width: 210mm; min-height: 297mm; background: white !important; padding: 40px !important; }`
-                                                                })
-                                                            });
-                                                            const blob = await response.blob();
-                                                            const url = URL.createObjectURL(blob);
-                                                            const a = document.createElement('a');
-                                                            a.href = url;
-                                                            a.download = `${resume.personalDetails.fullName}.pdf`;
-                                                            a.click();
-                                                        }}
-                                                    >
-                                                        PDF
-                                                    </button>
-                                                    <button
-                                                        className="glass-pill"
-                                                        style={{ padding: '0.5rem', color: '#ef4444' }}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (window.confirm('Delete this resume?')) deleteResume(resume.id);
-                                                        }}
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px' }}>
+                                                <button className="btn-primary" style={{ padding: '10px', fontSize: '0.9rem', background: 'var(--bg-soft)', color: 'var(--fg)', border: '1px solid var(--border)' }}>Edit Card</button>
+                                                <button className="btn-primary" style={{ padding: '10px', fontSize: '0.9rem' }}>Export PDF</button>
+                                                <button
+                                                    className="glass-panel"
+                                                    style={{ padding: '0 12px', color: '#ef4444', borderRadius: '12px' }}
+                                                    onClick={(e) => { e.stopPropagation(); if (window.confirm('Erase this architecture?')) deleteResume(resume.id); }}
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
                                             </div>
                                         </div>
                                     </motion.div>
                                 )) : (
-                                    <div className="glass-panel" style={{ gridColumn: '1/-1', padding: '4rem', textAlign: 'center', color: 'var(--fg-muted)' }}>
-                                        <Briefcase size={40} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                                        <p>No architectures found in this sector.</p>
+                                    <div className="glass-panel" style={{ gridColumn: '1/-1', padding: '6rem 2rem', textAlign: 'center', color: 'var(--fg-muted)', borderRadius: '32px' }}>
+                                        <Briefcase size={48} style={{ margin: '0 auto 1.5rem', opacity: 0.3 }} />
+                                        <h3 style={{ fontSize: '1.5rem', color: 'var(--fg)', marginBottom: '0.5rem' }}>No Data Fragments</h3>
+                                        <p>Your production pipeline is currently idle. Initialize a new architecture to begin.</p>
                                     </div>
                                 )}
                             </AnimatePresence>
-                        </div>
-                    </motion.div>
-
-                    {/* Sidebar / Tools */}
-                    <div>
-                        <div className="glass-panel" style={{ padding: '2rem', position: 'sticky', top: '140px' }}>
-                            <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '2rem', color: 'var(--fg-muted)' }}>System Tools</h4>
-
-                            <ul style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', listStyle: 'none' }}>
-                                <li style={{ display: 'flex', gap: '1rem', alignItems: 'center', cursor: 'pointer', opacity: 0.8 }} className="hover-glow">
-                                    <Briefcase size={20} color="var(--accent)" />
-                                    <span>Application Tracker</span>
-                                </li>
-                                <li style={{ display: 'flex', gap: '1rem', alignItems: 'center', cursor: 'pointer', opacity: 0.8 }} className="hover-glow">
-                                    <Zap size={20} color="#eab308" />
-                                    <span>Cover Letter AI</span>
-                                </li>
-                            </ul>
-
-                            <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
-                                <h4 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>Pro Account</h4>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', marginBottom: '1rem' }}>Unlock unlimited templates and advanced analysis.</p>
-                                <button className="btn-primary" style={{ width: '100%', fontSize: '0.9rem' }}>UPGRADE</button>
-                            </div>
-                        </div>
+                        </motion.div>
                     </div>
 
+                    {/* Sidebar Command Center */}
+                    <aside style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+                        {/* Intelligence Card */}
+                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px', background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)', color: 'white' }}>
+                            <Zap size={32} style={{ marginBottom: '1.5rem' }} />
+                            <h4 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '1rem' }}>AI Intelligence</h4>
+                            <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: 1.6, marginBottom: '2rem' }}>
+                                {(() => {
+                                    const topScore = resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0;
+                                    return `Our neural network analyzed your highest score (${topScore}%). You're ${Math.max(0, topScore - 60)}% above the industry average.`;
+                                })()}
+                            </p>
+                            <button style={{ width: '100%', padding: '1rem', borderRadius: '16px', border: 'none', background: 'white', color: 'var(--accent)', fontWeight: 700, cursor: 'pointer' }}>
+                                VIEW INSIGHTS
+                            </button>
+                        </div>
+
+
+                        {/* System Tools */}
+                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px' }}>
+                            <h4 style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '2rem', fontWeight: 700 }}>Commander Tools</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                <div className="flex-between" style={{ cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                        <div style={{ padding: '10px', background: 'var(--bg-soft)', borderRadius: '12px' }}><Layout size={20} color="var(--accent)" /></div>
+                                        <span style={{ fontWeight: 600 }}>Multi-Repo Sync</span>
+                                    </div>
+                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }}></div>
+                                </div>
+                                <div className="flex-between" style={{ cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                        <div style={{ padding: '10px', background: 'var(--bg-soft)', borderRadius: '12px' }}><Zap size={20} color="#EAB308" /></div>
+                                        <span style={{ fontWeight: 600 }}>Cover Letter AI</span>
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', background: 'var(--accent)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>BETA</span>
+                                </div>
+                                <div className="flex-between" style={{ cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                        <div style={{ padding: '10px', background: 'var(--bg-soft)', borderRadius: '12px' }}><TrendingUp size={20} color="#4ADE80" /></div>
+                                        <span style={{ fontWeight: 600 }}>Market Analytics</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Pro Expansion */}
+                        <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '32px', textAlign: 'center', border: '2px solid var(--accent)' }}>
+                            <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem' }}>Scale Operations</h4>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--fg-muted)', marginBottom: '1.5rem' }}>Unlock infinite architectures and elite neuro-templates.</p>
+                            <button className="btn-primary" style={{ width: '100%', padding: '1rem' }}>UPGRADE TO PRO</button>
+                        </div>
+
+                    </aside>
                 </div>
 
                 {/* Hidden Renders for PDF extraction */}
