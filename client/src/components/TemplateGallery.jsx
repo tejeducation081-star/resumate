@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { templates, fontOptions } from '../templates/config';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, Palette, X, Layout, Lock } from 'lucide-react';
+import { ArrowLeft, Check, Palette, X, Layout, Lock, Sparkles } from 'lucide-react';
 import useResumeStore from '../store/resumeStore';
 import useAuthStore from '../store/authStore';
 import TemplatePreview from './TemplatePreview';
+import PremiumModal from './PremiumModal';
 import { sampleResume } from '../data/sampleResume';
 
 // High-Fidelity Mini Thumbnail Component 
@@ -362,9 +363,11 @@ const TemplateGallery = ({ setView }) => {
     const { user, checkPremiumStatus } = useAuthStore();
     const isPremium = checkPremiumStatus();
 
-    // Free users can only see first 10 templates
-    const FREE_TEMPLATE_LIMIT = 10;
-    const availableTemplates = isPremium ? templates : templates.slice(0, FREE_TEMPLATE_LIMIT);
+    // Logged in users get full access to all 25+ architectures
+    const FREE_TEMPLATE_LIMIT = user ? 999 : 10;
+    const availableTemplates = templates;
+
+    const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
     // Dynamic Font Loader for Preview
     React.useEffect(() => {
@@ -406,10 +409,11 @@ const TemplateGallery = ({ setView }) => {
         '#1F1F1F', '#2F2F2F', '#3F3F3F', '#1A1A2E'  // Very dark tones
     ];
 
-    const { setCurrentResume } = useResumeStore();
+    const { setCurrentResume, setIsPreviewing } = useResumeStore();
 
     const handleTemplateClick = (template) => {
         setSelectedTemplate(template);
+        setIsPreviewing(true); // Hide Navbar
         setSelectedColor(template?.styles?.accent && template.styles.accent !== '#374151' ? template.styles.accent : accentColors[0]);
         setSelectedBgColor(template?.styles?.sidebarBg || '#111827');
         setCustomFontFamily(template?.styles?.fontFamily || "'Inter', sans-serif");
@@ -427,89 +431,70 @@ const TemplateGallery = ({ setView }) => {
             customFontFamily,
             customFontSize
         });
+
+        if (!user) {
+            setIsPremiumModalOpen(true);
+            return;
+        }
+
         setView('editor');
+        setIsPreviewing(false); // Restore Navbar state for editor (or let editor handle it)
     };
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2rem 2rem 4rem 2rem', position: 'relative' }}>
-            <div style={{ maxWidth: '1400px', margin: '0 auto 3rem auto', display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                <button
-                    onClick={() => setView('dashboard')}
-                    style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: 'white',
-                        border: '1px solid var(--border)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        color: 'var(--fg)',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-                        transition: 'transform 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                    <ArrowLeft size={24} />
-                </button>
-                <div>
-                    <h1 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--fg)' }}>Select Your Architecture</h1>
-                    <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>Choose from our curated collection of 25+ unique professional resume templates.</p>
+            <div style={{ maxWidth: '1400px', margin: '2rem auto', textAlign: 'center', padding: '0 1rem' }}>
+                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', fontWeight: 900, marginBottom: '1rem', color: 'var(--fg)', letterSpacing: '-0.03em' }}>
+                    Select Your <span className="text-gradient">Architecture</span>
+                </h1>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{ padding: '6px 16px', background: 'var(--accent)', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 10px 20px var(--accent-alpha)' }}>
+                        <Sparkles size={16} color="white" />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'white', letterSpacing: '0.1em' }}>NEURAL SELECTION ACTIVE</span>
+                    </div>
+                    <p style={{ color: 'var(--fg-muted)', fontSize: '1.2rem', maxWidth: '700px', lineHeight: 1.6 }}>
+                        Browse our curated collection of 25+ pixel-perfect resume architectures. Optimized for high-fidelity parsing across all major enterprise ATS platforms.
+                    </p>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1.5rem', maxWidth: '100%', margin: '0 auto' }}>
+            <div className="responsive-grid" style={{ maxWidth: '100%', margin: '0 auto' }}>
                 {templates.map((template, index) => {
-                    const isLocked = !isPremium && index >= FREE_TEMPLATE_LIMIT;
-
                     return (
                         <motion.div
                             key={template.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            whileHover={!isLocked ? { y: -10, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' } : {}}
-                            onClick={() => !isLocked && handleTemplateClick(template)}
+                            whileHover={{ y: -10, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}
+                            onClick={() => handleTemplateClick(template)}
                             style={{
                                 background: 'white',
                                 borderRadius: '16px',
                                 overflow: 'hidden',
                                 border: '1px solid var(--border)',
-                                cursor: isLocked ? 'not-allowed' : 'pointer',
+                                cursor: 'pointer',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                opacity: isLocked ? 0.6 : 1,
                                 position: 'relative'
                             }}
                         >
-                            {isLocked && (
+                            {index >= FREE_TEMPLATE_LIMIT && (
                                 <div style={{
                                     position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    background: 'rgba(0, 0, 0, 0.4)',
+                                    top: 15,
+                                    right: 15,
+                                    zIndex: 10,
+                                    background: 'rgba(255, 255, 255, 0.95)',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    zIndex: 10,
-                                    borderRadius: '16px',
-                                    backdropFilter: 'blur(2px)'
+                                    gap: '6px',
+                                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                                    border: '1px solid #E5E7EB'
                                 }}>
-                                    <div style={{
-                                        background: 'white',
-                                        borderRadius: '50%',
-                                        width: '60px',
-                                        height: '60px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
-                                    }}>
-                                        <Lock size={28} color="#111827" />
-                                    </div>
+                                    <Lock size={12} color="var(--accent)" />
+                                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)' }}>PRO</span>
                                 </div>
                             )}
                             <div style={{ height: '340px', background: '#f9fafb', position: 'relative', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -520,8 +505,8 @@ const TemplateGallery = ({ setView }) => {
                             <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                                     <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--fg)' }}>{template.name}</h3>
-                                    {isLocked ? (
-                                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>Premium</span>
+                                    {index >= FREE_TEMPLATE_LIMIT ? (
+                                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>Exclusive</span>
                                     ) : (
                                         template.styles.headerStyle !== 'left' && <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#F3F4F6', color: '#6B7280' }}>{template.styles.headerStyle}</span>
                                     )}
@@ -533,9 +518,15 @@ const TemplateGallery = ({ setView }) => {
                 })}
             </div>
 
+            <PremiumModal
+                isOpen={isPremiumModalOpen}
+                onClose={() => setIsPremiumModalOpen(false)}
+                setView={setView}
+            />
+
             <AnimatePresence>
                 {selectedTemplate && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)' }} onClick={() => setSelectedTemplate(null)}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)' }} onClick={() => { setSelectedTemplate(null); setIsPreviewing(false); }}>
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -543,141 +534,90 @@ const TemplateGallery = ({ setView }) => {
                             style={{ background: 'white', borderRadius: '24px', padding: '0', maxWidth: '1100px', width: '95%', height: '85vh', display: 'flex', boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.25)', overflow: 'hidden', position: 'relative' }}
                             onClick={e => e.stopPropagation()}
                         >
-                            <button onClick={() => setSelectedTemplate(null)} style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, background: 'rgba(255,255,255,0.8)', padding: 8, borderRadius: '50%', cursor: 'pointer', border: 'none' }}><X size={24} color="#374151" /></button>
+                            <button onClick={() => { setSelectedTemplate(null); setIsPreviewing(false); }} style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, background: 'rgba(255,255,255,0.8)', padding: 8, borderRadius: '50%', cursor: 'pointer', border: 'none' }}><X size={24} color="#374151" /></button>
 
-                            <div style={{ width: '380px', padding: '40px', background: '#FFFFFF', display: 'flex', flexDirection: 'column', borderRight: '1px solid #E5E7EB', zIndex: 2, overflowY: 'auto' }}>
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: '#9CA3AF', letterSpacing: '0.1em', marginBottom: '8px' }}>Selected Template</h4>
-                                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#111827', lineHeight: 1.1 }}>{selectedTemplate.name}</h1>
-                                    <p style={{ fontSize: '1rem', color: '#6B7280', marginTop: '8px' }}>{selectedTemplate.styles.layout} Layout</p>
-                                </div>
-
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Palette size={16} /> Heading Color
-                                    </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-                                        {accentColors.map(color => (
-                                            <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '40px', height: '40px', borderRadius: '50%', background: color, border: selectedColor === color ? '3px solid white' : '2px solid white', boxShadow: selectedColor === color ? `0 0 0 2px ${color}` : '0 2px 5px rgba(0,0,0,0.1)', cursor: 'pointer', transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)' }}>
-                                                {selectedColor === color && <Check size={16} color="white" style={{ margin: 'auto' }} />}
-                                            </button>
-                                        ))}
+                            <div className="mobile-stack" style={{ width: '100%', height: '100%', overflowY: 'auto' }}>
+                                <div style={{ width: '100%', maxWidth: '420px', padding: 'clamp(1.5rem, 5vw, 2.5rem)', background: '#FFFFFF', display: 'flex', flexDirection: 'column', borderRight: '1px solid #E5E7EB', zIndex: 2, margin: '0 auto' }}>
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h4 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: '#9CA3AF', letterSpacing: '0.1em', marginBottom: '8px' }}>Selected Template</h4>
+                                        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', fontWeight: 800, color: '#111827', lineHeight: 1.1 }}>{selectedTemplate.name}</h1>
+                                        <p style={{ fontSize: '0.95rem', color: '#6B7280', marginTop: '8px' }}>{selectedTemplate.styles.layout} Layout Engine</p>
                                     </div>
-                                </div>
 
-                                {(selectedTemplate?.styles?.layout?.includes('sidebar') || ['cyber', 'timeline', 'brutalist', 'neon-banner'].includes(selectedTemplate?.styles?.layout) || selectedTemplate?.styles?.sidebarBg) && (
                                     <div style={{ marginBottom: '2rem' }}>
                                         <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <Layout size={16} /> Sidebar/Background
+                                            <Palette size={16} /> Heading Color
                                         </h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-                                            {bgColors.map(color => (
-                                                <button key={color} onClick={() => setSelectedBgColor(color)} style={{ width: '40px', height: '40px', borderRadius: '50%', background: color, border: selectedBgColor === color ? '3px solid white' : '2px solid white', boxShadow: selectedBgColor === color ? `0 0 0 2px ${color}` : '0 2px 5px rgba(0,0,0,0.1)', cursor: 'pointer', transform: selectedBgColor === color ? 'scale(1.1)' : 'scale(1)' }}>
-                                                    {selectedBgColor === color && <Check size={16} color="white" style={{ margin: 'auto' }} />}
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(40px, 1fr))', gap: '8px' }}>
+                                            {accentColors.map(color => (
+                                                <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '36px', height: '36px', borderRadius: '50%', background: color, border: selectedColor === color ? '3px solid white' : '2px solid white', boxShadow: selectedColor === color ? `0 0 0 2px ${color}` : '0 2px 5px rgba(0,0,0,0.1)', cursor: 'pointer', transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)' }}>
+                                                    {selectedColor === color && <Check size={16} color="white" style={{ margin: 'auto' }} />}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
-                                )}
 
-                                <div style={{ marginBottom: 'auto' }}>
-                                    <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ fontSize: '14px', fontWeight: 900 }}>Aa</div> Typography
-                                    </h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                        {/* Custom Font Picker */}
-                                        <div style={{ position: 'relative' }}>
-                                            <button
-                                                onClick={() => document.getElementById('font-dropdown').style.display = document.getElementById('font-dropdown').style.display === 'block' ? 'none' : 'block'}
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '12px',
-                                                    borderRadius: '8px',
-                                                    border: '1px solid #E5E7EB',
-                                                    background: 'white',
-                                                    fontSize: '0.95rem',
-                                                    textAlign: 'left',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    fontFamily: customFontFamily
-                                                }}
-                                            >
-                                                {fontOptions.find(f => f.value === customFontFamily)?.name || 'Select Font'}
-                                                <span style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>▼</span>
-                                            </button>
-                                            <div
-                                                id="font-dropdown"
-                                                style={{
-                                                    display: 'none',
-                                                    position: 'absolute',
-                                                    top: '100%',
-                                                    left: 0,
-                                                    width: '100%',
-                                                    maxHeight: '300px',
-                                                    overflowY: 'auto',
-                                                    background: 'white',
-                                                    border: '1px solid #E5E7EB',
-                                                    borderRadius: '8px',
-                                                    zIndex: 100,
-                                                    marginTop: '5px',
-                                                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
-                                                }}
-                                            >
-                                                {fontOptions.map((font) => (
-                                                    <div
-                                                        key={font.name}
-                                                        onClick={() => {
-                                                            setCustomFontFamily(font.value);
-                                                            document.getElementById('font-dropdown').style.display = 'none';
-                                                        }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.background = '#F3F4F6'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                                        style={{
-                                                            padding: '10px 15px',
-                                                            cursor: 'pointer',
-                                                            fontFamily: font.value,
-                                                            fontSize: '1rem',
-                                                            borderBottom: '1px solid #f3f4f6'
-                                                        }}
-                                                    >
-                                                        {font.name}
-                                                    </div>
+                                    {(selectedTemplate?.styles?.layout?.includes('sidebar') || ['cyber', 'timeline', 'brutalist', 'neon-banner'].includes(selectedTemplate?.styles?.layout) || selectedTemplate?.styles?.sidebarBg) && (
+                                        <div style={{ marginBottom: '2rem' }}>
+                                            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <Layout size={16} /> Sidebar/Background
+                                            </h3>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(40px, 1fr))', gap: '8px' }}>
+                                                {bgColors.map(color => (
+                                                    <button key={color} onClick={() => setSelectedBgColor(color)} style={{ width: '36px', height: '36px', borderRadius: '50%', background: color, border: selectedBgColor === color ? '3px solid white' : '2px solid white', boxShadow: selectedBgColor === color ? `0 0 0 2px ${color}` : '0 2px 5px rgba(0,0,0,0.1)', cursor: 'pointer', transform: selectedBgColor === color ? 'scale(1.1)' : 'scale(1)' }}>
+                                                        {selectedBgColor === color && <Check size={16} color="white" style={{ margin: 'auto' }} />}
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
+                                    )}
 
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>Size: {customFontSize}px</span>
-                                            <input
-                                                type="range"
-                                                min="12"
-                                                max="20"
-                                                step="0.5"
-                                                value={customFontSize}
-                                                onChange={(e) => setCustomFontSize(Number(e.target.value))}
-                                                style={{ flex: 1 }}
-                                            />
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ fontSize: '14px', fontWeight: 900 }}>Aa</div> Typography
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <select
+                                                value={customFontFamily}
+                                                onChange={(e) => setCustomFontFamily(e.target.value)}
+                                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E5E7EB', background: 'white', fontSize: '0.95rem', fontFamily: customFontFamily }}
+                                            >
+                                                {fontOptions.map(font => (
+                                                    <option key={font.name} value={font.value} style={{ fontFamily: font.value }}>{font.name}</option>
+                                                ))}
+                                            </select>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>Size: {customFontSize}px</span>
+                                                <input
+                                                    type="range"
+                                                    min="12"
+                                                    max="20"
+                                                    step="0.5"
+                                                    value={customFontSize}
+                                                    onChange={(e) => setCustomFontSize(Number(e.target.value))}
+                                                    style={{ flex: 1 }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <button onClick={handleCreate} style={{ width: '100%', marginTop: 'auto', padding: '18px', background: '#111827', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                                        Use This Design <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} />
+                                    </button>
                                 </div>
 
-                                <button onClick={handleCreate} style={{ width: '100%', marginTop: '20px', padding: '18px', background: '#111827', color: 'white', border: 'none', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                    Use This Design <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} />
-                                </button>
-                            </div>
-
-                            <div style={{ flex: 1, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
-                                <div style={{ transform: 'scale(0.55)', transformOrigin: 'center center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', borderRadius: '4px', marginTop: '40px' }}>
-                                    <TemplatePreview data={{ ...sampleResume, templateId: selectedTemplate.id, customColor: selectedColor, customBgColor: selectedBgColor, customFontFamily, customFontSize }} />
+                                <div style={{ flex: 1, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '2rem 0' }}>
+                                    <div style={{ transform: 'scale(clamp(0.4, 60vw, 0.6))', transformOrigin: 'center center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', borderRadius: '4px' }}>
+                                        <TemplatePreview data={{ ...sampleResume, templateId: selectedTemplate.id, customColor: selectedColor, customBgColor: selectedBgColor, customFontFamily, customFontSize }} />
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 

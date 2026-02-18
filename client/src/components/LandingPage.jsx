@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { ArrowRight, CheckCircle, BarChart3, Layers, Zap, Cloud, Lock, Play, PenTool, Download, Globe, Cpu, ChevronRight } from 'lucide-react';
+import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'framer-motion';
+import { ArrowRight, CheckCircle, BarChart3, Layers, Zap, Cloud, Lock, Play, PenTool, Download, Globe, Cpu, ChevronRight, ChevronDown } from 'lucide-react';
 import ResumeLogo from './ResumeLogo';
 import ProductVideo from './ProductVideo';
 
 const LandingPage = ({ setView }) => {
     const { scrollY, scrollYProgress } = useScroll();
-    const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-    const y2 = useTransform(scrollY, [0, 500], [0, -150]);
+
+    // Smooth out scroll-linked values
+    const smoothProgress = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
+    const y1 = useTransform(smoothProgress, [0, 0.5], [0, 150]);
+    const y2 = useTransform(smoothProgress, [0, 0.5], [0, -100]);
 
     // Carousel State
     const [currentImage, setCurrentImage] = useState(0);
@@ -122,16 +130,17 @@ const LandingPage = ({ setView }) => {
                             bypass filters and position you as the top 1% candidate.
                         </p>
 
-                        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
                             <button
                                 className="btn-primary"
-                                style={{ padding: '16px 40px', fontSize: '1.1rem' }}
-                                onClick={() => setView('auth')}
+                                style={{ padding: '16px 40px', fontSize: '1.1rem', width: '100%', maxWidth: '280px' }}
+                                onClick={() => setView('templates')}
                             >
-                                Launch Editor <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+                                START BUILDING <ArrowRight size={20} style={{ marginLeft: '8px' }} />
                             </button>
                             <button
                                 className="btn-secondary"
+                                style={{ width: '100%', maxWidth: '280px' }}
                                 onClick={() => document.getElementById('multimedia').scrollIntoView({ behavior: 'smooth' })}
                             >
                                 Watch Demo
@@ -141,14 +150,14 @@ const LandingPage = ({ setView }) => {
 
                     {/* Floating Interface Carousel */}
                     <motion.div
-                        style={{ marginTop: '2rem', y: y1 }}
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        style={{ marginTop: '4rem', y: y1 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.4, duration: 1 }}
                     >
                         <div className="glass-panel" style={{
-                            borderRadius: '20px',
-                            padding: '12px',
+                            borderRadius: '24px',
+                            padding: 'clamp(8px, 2vw, 16px)',
                             background: 'rgba(255,255,255,0.03)',
                             border: '1px solid rgba(255,255,255,0.1)',
                             boxShadow: '0 50px 120px -20px rgba(0,0,0,0.6)',
@@ -193,13 +202,51 @@ const LandingPage = ({ setView }) => {
                 </div>
             </section>
 
+            {/* HOW IT WORKS SECTION */}
+            <section id="workflow" style={{ padding: '8rem 0', background: 'var(--bg-soft)' }}>
+                <div className="container">
+                    <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+                        <span style={{ color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem' }}>The Blueprint</span>
+                        <h2 style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>Your Path to the <span className="text-gradient">Top 1%.</span></h2>
+                        <p style={{ color: 'var(--fg-muted)', fontSize: '1.1rem' }}>A clinical engineering process for your professional identity.</p>
+                    </div>
+
+                    <div className="responsive-grid">
+                        {[
+                            { step: "01", title: "Architecture", desc: "Select from 25+ neural-optimized templates designed for high-end readability.", icon: <Layers size={24} /> },
+                            { step: "02", title: "Intelligence", desc: "Our real-time ATS analyzer scores your content and suggests surgical improvements.", icon: <Cpu size={24} /> },
+                            { step: "03", title: "Authorization", desc: "Secure your Premium License from our Admin to unlock full infrastructure access.", icon: <Lock size={24} /> },
+                            { step: "04", title: "Deployment", desc: "Directly sync your architecture to Naukri, Indeed, and LinkedIn with one click.", icon: <Globe size={24} /> }
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ delay: i * 0.1, duration: 0.8, ease: "easeOut" }}
+                                whileHover={{ y: -10 }}
+                                className="glass-panel"
+                                style={{ padding: '2.5rem', borderRadius: '24px', position: 'relative', border: '1px solid var(--border)' }}
+                            >
+                                <div style={{ fontSize: '3rem', fontWeight: 900, opacity: 0.05, position: 'absolute', top: '1rem', right: '1rem', color: 'var(--fg)' }}>{item.step}</div>
+                                <div style={{ width: '50px', height: '50px', background: 'var(--accent)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', marginBottom: '1.5rem', boxShadow: '0 10px 20px var(--accent-alpha)' }}>
+                                    {item.icon}
+                                </div>
+                                <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>{item.title}</h3>
+                                <p style={{ color: 'var(--fg-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>{item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
 
 
 
             {/* MULTIMEDIA / VIDEO SECTION */}
             <section id="features" style={{ padding: '8rem 0', position: 'relative' }}>
                 <div className="container">
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+                    <div className="mobile-stack" style={{ gap: '4rem', alignItems: 'center' }}>
                         <div>
                             <span style={{ color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.1em' }}>NEURAL RECRUITER ENGINE</span>
                             <h2 style={{ fontSize: '3rem', margin: '1rem 0 2rem 0' }}>It works like magic. <br /><span style={{ opacity: 0.5 }}>Because it is.</span></h2>
@@ -229,6 +276,42 @@ const LandingPage = ({ setView }) => {
                         {/* Graphic / Video Container */}
                         <div id="multimedia" className="glass-panel" style={{ borderRadius: '24px', padding: '1rem', position: 'relative' }}>
                             <ProductVideo />
+                            {/* Float Tags */}
+                            <div style={{ position: 'absolute', top: '-10px', left: '-10px', background: '#FF6B6B', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 800, fontSize: '0.75rem', boxShadow: 'var(--shadow-md)', transform: 'rotate(-5deg)' }}>ATS VERIFIED 98.4%</div>
+                            <div style={{ position: 'absolute', bottom: '20px', right: '-20px', background: 'var(--accent)', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 800, fontSize: '0.75rem', boxShadow: 'var(--shadow-md)', transform: 'rotate(3deg)' }}>NEURAL ENGINE ON</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* INTEGRATIONS / SYNC SECTION */}
+            <section style={{ padding: '6rem 0', borderBottom: '1px solid var(--border)' }}>
+                <div className="container">
+                    <div className="mobile-stack" style={{ alignItems: 'center', justifyContent: 'space-between', gap: '4rem' }}>
+                        <div style={{ flex: 1 }}>
+                            <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Direct Global Synchronization</h2>
+                            <p style={{ color: 'var(--fg-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
+                                Why waste hours uploading manually? Resumate integrates directly with the world's most powerful job boards. Update your profile architecture across all platforms instantly.
+                            </p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                                {['Naukri.com', 'Indeed', 'LinkedIn', 'Glassdoor', 'Google Jobs', 'Monster'].map(job => (
+                                    <div key={job} style={{ padding: '8px 16px', borderRadius: '100px', background: 'var(--bg-soft)', border: '1px solid var(--border)', fontSize: '0.85rem', fontWeight: 600 }}>
+                                        {job}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', borderRadius: '24px', border: '2px solid var(--accent)' }}>
+                                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '0.5rem' }}>01</div>
+                                <div style={{ fontWeight: 700 }}>Single Source</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>One master architecture</div>
+                            </div>
+                            <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', borderRadius: '24px' }}>
+                                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '0.5rem' }}>∞</div>
+                                <div style={{ fontWeight: 700 }}>Infinite Sync</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>Automatic updates</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -247,6 +330,10 @@ const LandingPage = ({ setView }) => {
                         {templates.map((template, i) => (
                             <motion.div
                                 key={i}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
                                 whileHover={{ y: -10 }}
                                 style={{
                                     background: 'var(--surface)',
@@ -285,7 +372,7 @@ const LandingPage = ({ setView }) => {
                                         position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
                                         opacity: 0, transition: 'opacity 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center'
                                     }}>
-                                        <button className="btn-primary" onClick={() => setView('auth')}>Use Template</button>
+                                        <button className="btn-primary" onClick={() => setView('templates')}>Use Template</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -293,6 +380,46 @@ const LandingPage = ({ setView }) => {
                     </div>
                 </div>
             </section>
+
+            {/* COMMAND CENTER SHOWCASE (DASHBOARD) */}
+            <section id="dashboard-preview" style={{ padding: '8rem 0', position: 'relative' }}>
+                <div className="container">
+                    <div className="mobile-stack" style={{ gap: '5rem', alignItems: 'center' }}>
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ padding: '1rem', background: 'var(--surface)', borderRadius: '32px', border: '1px solid var(--border)', boxShadow: '0 50px 100px -20px rgba(0,0,0,0.3)', position: 'relative', zIndex: 10 }}>
+                                <img src="/landing_hero_resume_mockup_1769946611712.png" alt="Features Preview" style={{ width: '100%', borderRadius: '24px', display: 'block' }} />
+                            </div>
+                            {/* Floating Stats */}
+                            <motion.div initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} style={{ position: 'absolute', top: '20%', left: '-40px', background: 'white', padding: '1.5rem', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 20 }}>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent)', marginBottom: '5px' }}>ATS SCORE</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>+412%</div>
+                            </motion.div>
+                        </div>
+                        <div>
+                            <span style={{ color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.1em' }}>ALL-IN-ONE CAREER SUITE</span>
+                            <h2 style={{ fontSize: '3rem', margin: '1rem 0 2rem 0' }}>The Ultimate <span className="text-gradient">Toolkit.</span></h2>
+                            <p style={{ color: 'var(--fg-muted)', fontSize: '1.1rem', lineHeight: 1.8, marginBottom: '2.5rem' }}>
+                                Dominate the job market with our integrated ecosystem. From architectural resume design to live global job hunting, we've engineered every tool you need to land your next elite role.
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {[
+                                    "Live Job Board (Naukri, Indeed & more)",
+                                    "ATS-Level Power Checker Engine",
+                                    "Instant Resume Creation & PDF Download",
+                                    "25+ Premium Architectural Templates",
+                                    "Direct Naukri & Indeed Job Facilities"
+                                ].map(feat => (
+                                    <div key={feat} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ color: 'var(--accent)' }}><CheckCircle size={20} /></div>
+                                        <span style={{ fontWeight: 600 }}>{feat}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
 
 
             {/* STATS / PROOF */}
@@ -313,22 +440,52 @@ const LandingPage = ({ setView }) => {
                 </div>
             </section>
 
+            {/* FAQ / SUPPORT SECTION */}
+            <section style={{ padding: '8rem 0' }}>
+                <div className="container" style={{ maxWidth: '800px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                        <h2 style={{ fontSize: '3rem' }}>Common Inquiries</h2>
+                        <p style={{ color: 'var(--fg-muted)' }}>Everything you need to know about the platform.</p>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        {[
+                            { q: "How do I get my Premium Credentials?", a: "Once you purchase premium, our administrator will verify the transaction and manually issue your unique credentials (ID/Password). This manual audit ensures every user receives personalized onboarding." },
+                            { q: "Is the ATS Power Score really different?", a: "Yes. Most checkers only look for keywords. Our Neural Engine analyzes Flesch-Kincaid readability, recursive parsing pathways, and hidden character contamination to ensure enterprise-grade compatibility." },
+                            { q: "Can I manage multiple architectures?", a: "Absolutely. Premium users can maintain a matrix of resume versions, each architecture precisely tuned for different industries or platforms." },
+                            { q: "What does 'Direct Global Sync' mean?", a: "It means you don't download and upload. You finalize your design in Resumate, click Sync, and we push the data directly into your Naukri and Indeed profiles via our secure API pipes." }
+                        ].map((faq, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                style={{ padding: '2rem', borderRadius: '20px', border: '1px solid var(--border)', background: 'var(--surface)' }}
+                            >
+                                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--fg)' }}>{faq.q}</h4>
+                                <p style={{ color: 'var(--fg-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>{faq.a}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+
             {/* CALL TO ACTION */}
             <section style={{ padding: '10rem 0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, var(--accent-glow) 0%, transparent 60%)', pointerEvents: 'none' }}></div>
 
 
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                <div className="container" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <h2 style={{ fontSize: '4rem', marginBottom: '2rem' }}>Ready to <span style={{ color: 'var(--accent)' }}>Ascend?</span></h2>
                     <p style={{ fontSize: '1.2rem', color: 'var(--fg-muted)', maxWidth: '600px', margin: '0 auto 3rem auto' }}>
                         Join thousands of professionals who switched to Resumate and landed their dream roles.
                     </p>
                     <button
                         className="btn-primary"
-                        style={{ padding: '18px 48px', fontSize: '1.2rem' }}
-                        onClick={() => setView('auth')}
+                        style={{ padding: '18px 48px', fontSize: '1.2rem', margin: '0 auto' }}
+                        onClick={() => setView('templates')}
                     >
-                        Create My Account
+                        Start Building Now
                     </button>
                 </div>
             </section>

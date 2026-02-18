@@ -63,6 +63,9 @@ connectDB().then(() => {
     seedAdminUser();
 });
 
+// Jobs route does NOT need DB — register it before the DB check
+app.use('/api/jobs', require('./routes/jobs'));
+
 // Block API routes if DB is not connected (returns 503)
 const dbCheck = require('./middleware/dbCheck');
 app.use('/api', dbCheck);
@@ -165,5 +168,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Resume Builder API running on port ${PORT}`);
     console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 CORS Origins: ${allowedOrigins.join(', ')}\n`);
+    console.log(`🔗 CORS Origins: ${allowedOrigins.join(', ')}`);
+    console.log(`🔑 RapidAPI Key: ${process.env.RAPID_API_KEY ? '✅ Configured (Live Jobs Active)' : '❌ Not set (using mock data)'}\n`);
 });

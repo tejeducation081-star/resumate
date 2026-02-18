@@ -8,10 +8,20 @@ async function seedAdminUser() {
         const adminEmail = 'admin.resumate@gmail.com';
 
         // Check if admin already exists
-        const existingAdmin = await User.findOne({ where: { email: adminEmail } });
+        const user = await User.findOne({ where: { email: adminEmail } });
 
-        if (existingAdmin) {
-            console.log('✅ Admin user already exists');
+        if (user) {
+            if (!user.isAdmin) {
+                // If user exists but is not an admin, promote them
+                await user.update({
+                    isAdmin: true,
+                    isPremium: true,
+                    premiumExpiresAt: null
+                });
+                console.log('✅ Existing user promoted to Admin');
+            } else {
+                console.log('✅ Admin user already exists');
+            }
             return;
         }
 

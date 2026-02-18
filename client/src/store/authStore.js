@@ -28,18 +28,18 @@ const useAuthStore = create((set) => ({
             set({ user: data.user, token: data.token });
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('token', data.token);
-            return { success: true };
+            return { success: true, user: data.user };
         } catch (err) {
             return { success: false, error: err.message };
         }
     },
 
-    register: async (username, email, password) => {
+    register: async (email, password) => {
         try {
-            const res = await fetch(API_ENDPOINTS.REGISTER, {
+            const res = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ username: email.split('@')[0], email, password })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Registration failed');
@@ -65,11 +65,32 @@ const useAuthStore = create((set) => ({
         localStorage.removeItem('local_resumes');
     },
 
+    getProfile: async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${API_ENDPOINTS.AUTH_BASE}/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                set({ user: data.user });
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+        } catch (err) {
+            console.error('Failed to fetch profile:', err);
+        }
+    },
+
     checkSession: async () => {
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user');
         if (token && user) {
             set({ token, user: JSON.parse(user) });
+            useAuthStore.getState().getProfile();
         }
     },
 

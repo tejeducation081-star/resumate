@@ -16,6 +16,9 @@ const safeParse = (key, fallback) => {
 const useResumeStore = create((set, get) => ({
     resumes: safeParse('local_resumes', []),
     currentResume: null,
+    isPreviewing: false,
+
+    setIsPreviewing: (val) => set({ isPreviewing: val }),
 
     fetchResumes: async () => {
         try {

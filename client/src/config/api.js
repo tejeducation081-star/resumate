@@ -5,6 +5,7 @@ const API_BASE_URL = rawBase.replace(/\/+$/g, '');
 
 export const API_ENDPOINTS = {
     // Auth
+    AUTH_BASE: `${API_BASE_URL}/api/auth`,
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     REGISTER: `${API_BASE_URL}/api/auth/register`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
@@ -20,6 +21,10 @@ export const API_ENDPOINTS = {
 
     // Upload
     UPLOAD_IMAGE: `${API_BASE_URL}/api/upload`,
+
+    // Jobs
+    SEARCH_JOBS: `${API_BASE_URL}/api/jobs/search`,
+    JOB_PLATFORMS: `${API_BASE_URL}/api/jobs/platforms`,
 };
 
 export default API_BASE_URL;

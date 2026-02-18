@@ -19,12 +19,16 @@ const AuthPage = ({ setView }) => {
         try {
             const res = isLogin
                 ? await login(formData.email, formData.password)
-                : await register(formData.username, formData.email, formData.password);
+                : await register(formData.email, formData.password);
 
             if (!res.success) {
                 setError(res.error);
             } else {
-                setView('dashboard');
+                if (res.user?.isAdmin) {
+                    setView('admin');
+                } else {
+                    setView('dashboard');
+                }
             }
         } catch (err) {
             setError('An unexpected error occurred');
@@ -34,28 +38,29 @@ const AuthPage = ({ setView }) => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', padding: '2rem' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-soft)', padding: '1rem' }}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                className="glass-panel"
                 style={{
                     width: '100%',
                     maxWidth: '450px',
-                    padding: '3rem',
+                    padding: 'clamp(1.5rem, 5vw, 3rem)',
                     borderRadius: '24px',
                     border: '1px solid var(--border)'
                 }}
-                className="glass-panel"
             >
-                <div style={{ textAlign: 'center', marginBottom: '3rem', position: 'relative' }}>
-
-
+                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                         <ResumeLogo size={56} />
                     </div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                    <h1 style={{ fontSize: 'clamp(1.75rem, 6vw, 2.25rem)', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                        {isLogin ? 'Resumate' : 'Join Resumate'}
                     </h1>
+                    <p style={{ color: 'var(--fg-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                        {isLogin ? 'Access your career infrastructure.' : 'Begin your journey to the top 1%.'}
+                    </p>
                 </div>
 
                 {error && (
@@ -75,22 +80,10 @@ const AuthPage = ({ setView }) => {
 
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {!isLogin && (
-                        <div>
-                            <label><User size={14} style={{ marginRight: '8px' }} /> Full Name</label>
-                            <input
-                                type="text"
-                                placeholder="Julian Bourne"
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                required
-                            />
-                        </div>
-                    )}
                     <div>
                         <label><Mail size={14} style={{ marginRight: '8px' }} /> Email Address</label>
                         <input
-                            type="email"
+                            type="text"
                             placeholder="name@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -121,10 +114,10 @@ const AuthPage = ({ setView }) => {
 
                 <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                     <button
-                        onClick={() => setIsLogin(!isLogin)}
-                        style={{ background: 'none', border: 'none', color: 'var(--fg-muted)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
+                        onClick={() => setView('landing')}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto', background: 'none', border: 'none', color: 'var(--fg-muted)', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600, opacity: 0.7 }}
                     >
-                        {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+                        <ArrowLeft size={16} /> Back to Home
                     </button>
                 </div>
             </motion.div>
