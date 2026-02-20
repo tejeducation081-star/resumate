@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useResumeStore from '../store/resumeStore';
 import useAuthStore from '../store/authStore';
 import { API_ENDPOINTS } from '../config/api';
@@ -30,6 +30,34 @@ const ResumeForm = ({ setView }) => {
   };
 
   const [formData, setFormData] = useState(currentResume ? { ...defaultState, ...currentResume } : defaultState);
+  const [scale, setScale] = useState(1);
+  const previewContainerRef = useRef(null);
+
+  useEffect(() => {
+    const calculateScale = () => {
+      if (previewContainerRef.current) {
+        const padding = 40; // 2rem padding
+        const containerWidth = previewContainerRef.current.offsetWidth - padding;
+        const containerHeight = previewContainerRef.current.offsetHeight - padding;
+        
+        const resumeWidth = 794; // 210mm in pixels at 96dpi
+        const resumeHeight = 1123; // 297mm per page at 96dpi
+
+        // Calculate scale considering both width and height constraints
+        const scaleByWidth = containerWidth / resumeWidth;
+        const scaleByHeight = containerHeight / resumeHeight;
+        
+        // Use the smaller scale to fit the entire page
+        const calculatedScale = Math.min(scaleByWidth, scaleByHeight, 0.65);
+        
+        setScale(Math.max(calculatedScale, 0.4)); // Minimum 0.4 scale
+      }
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
 
   // Dynamic Font Loader
   useEffect(() => {
@@ -118,28 +146,31 @@ const ResumeForm = ({ setView }) => {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
       gap: '2rem',
-      maxWidth: '1280px',
+      maxWidth: '1440px',
       margin: '0 auto',
-      minHeight: 'calc(100vh - 100px)',
+      height: 'calc(100vh - 60px)',
+      maxHeight: 'calc(100vh - 60px)',
       marginTop: '20px',
       padding: '0 20px',
-      position: 'relative'
+      position: 'relative',
+      overflow: 'hidden'
     }}>
 
       {/* 1. Left Column: Form */}
       <div className={`editor-form-col ${showPreviewMobile ? 'mobile-hidden' : ''}`} style={{
-        padding: '0 0 2rem 0',
-        overflowY: { md: 'auto' },
+        padding: '0 0 1rem 0',
         background: 'var(--bg)',
         borderRadius: '16px',
         border: '1px solid var(--border)',
         height: '100%',
+        maxHeight: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        overflow: 'hidden'
       }}>
 
-        <div style={{ padding: '1.5rem 1rem' }}>
-          <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '1.5rem 1rem 0.5rem 1rem' }}>
+          <header style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <button
                 onClick={() => setView('dashboard')}
@@ -161,6 +192,9 @@ const ResumeForm = ({ setView }) => {
             </div>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--muted)' }}>STEP {step}/5</span>
           </header>
+        </div>
+
+        <div style={{ padding: '0 1rem 1.5rem 1rem', flex: 1, overflowY: 'auto', scrollbarWidth: 'thin', minHeight: 0 }}>
 
           {step === 1 && (
             <div className="step-content">
@@ -391,28 +425,42 @@ const ResumeForm = ({ setView }) => {
         />
       </div>
 
-      {/* 2. Right Column: Preview */}
-      <div className={`preview-panel-col ${showPreviewMobile ? 'mobile-visible' : 'mobile-hidden'}`} style={{
-        background: 'var(--surface)',
-        overflowY: { md: 'auto' },
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '2rem 0',
-        borderRadius: '16px',
-        border: '1px solid var(--border)',
-        height: '100%'
-      }}>
-        <div className="preview-container-scale" style={{
-          transform: 'scale(1)',
-          transformOrigin: 'top center',
-          height: 'fit-content',
-          width: '100%',
+      <div className={`preview-panel-col ${showPreviewMobile ? 'mobile-visible' : 'mobile-hidden'}`}
+        ref={previewContainerRef}
+        style={{
+          background: 'var(--surface)',
+          overflow: 'auto',
           display: 'flex',
-          justifyContent: 'center'
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          padding: '1.5rem',
+          borderRadius: '16px',
+          border: '1px solid var(--border)',
+          height: '100%',
+          position: 'relative',
+          gap: '1rem'
         }}>
-          <ErrorBoundary>
-            <TemplatePreview data={formData} />
-          </ErrorBoundary>
+        <div className="preview-scale-wrapper" style={{
+          width: `${794 * scale}px`,
+          transition: 'width 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1rem'
+        }}>
+          <div className="preview-container-scale" style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top center',
+            height: 'fit-content',
+            width: '794px',
+            display: 'flex',
+            justifyContent: 'center'
+          }}>
+            <ErrorBoundary>
+              <TemplatePreview data={formData} />
+            </ErrorBoundary>
+          </div>
         </div>
       </div>
 
@@ -575,8 +623,6 @@ const ResumeForm = ({ setView }) => {
                         display: none !important;
                     }
                     .preview-container-scale {
-                        transform: scale(0.42) !important;
-                        transform-origin: top center !important;
                         margin-bottom: 20px;
                         margin-top: 20px;
                     }
@@ -585,7 +631,19 @@ const ResumeForm = ({ setView }) => {
                     .mobile-only { display: none !important; }
                     .preview-panel-col { display: flex !important; }
                     .editor-form-col { display: flex !important; }
-                    .preview-container-scale { transform: scale(0.8) !important; }
+                    .preview-container-scale { }
+                }
+
+                /* Multi-page preview styling */
+                #resume-preview-container {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    gap: 1rem;
+                }
+
+                #resume-preview-container [data-page] {
+                    margin-bottom: 10px !important;
                 }
 
                 .step-content input {

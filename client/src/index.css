@@ -15,14 +15,13 @@ html {
   --fg-muted: #64748b;
   /* Slate 500 */
 
-  --accent: #6366F1;
-  /* Indigo 500 - Primary Action */
-  --accent-glow: rgba(99, 102, 241, 0.2);
-  --accent-deep: #4338CA;
-  /* Indigo 700 */
+  /* Resumate Blue Brand Palette */
+  --accent: #0091FF;
+  --accent-glow: rgba(0, 145, 255, 0.15);
+  --accent-deep: #0070C5;
 
-  --secondary: #A855F7;
-  /* Purple 500 */
+  --secondary: #0EA5E9;
+  /* Sky 500 - Secondary Action */
   --cyan: #06B6D4;
 
   --border: rgba(0, 0, 0, 0.08);

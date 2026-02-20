@@ -307,12 +307,27 @@ const Dashboard = ({ setView }) => {
                                         style={{ padding: '0', overflow: 'hidden', cursor: 'pointer', borderRadius: '24px' }}
                                         onClick={() => handlePreview(resume)}
                                     >
-                                        <div style={{ height: '280px', background: 'var(--bg-soft)', position: 'relative', overflow: 'hidden' }}>
-                                            <div style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '210mm', position: 'absolute', top: '24px', left: '24px', background: 'white', boxShadow: '0 15px 45px rgba(0,0,0,0.2)' }}>
+                                        <div style={{
+                                            height: '380px',
+                                            background: '#f1f5f9',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)',
+                                            paddingTop: '20px'
+                                        }}>
+                                            <div style={{
+                                                transform: 'scale(0.42)',
+                                                transformOrigin: 'top center',
+                                                width: '210mm',
+                                                background: 'white',
+                                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                                height: 'max-content',
+                                                minHeight: '297mm'
+                                            }}>
                                                 <TemplatePreview data={resume} />
                                             </div>
-                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--bg-soft) 0%, transparent 80%)' }}></div>
-
                                         </div>
 
                                         <div style={{ padding: '2rem' }}>
@@ -336,12 +351,12 @@ const Dashboard = ({ setView }) => {
                                                 <MoreVertical size={20} color="var(--fg-muted)" />
                                             </div>
 
-                                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                                <button onClick={(e) => handleEdit(e, resume)} className="btn-secondary" style={{ flex: 1, padding: '10px 12px', fontSize: '0.85rem', borderRadius: '12px', minWidth: '100px' }}>Edit</button>
-                                                <button onClick={(e) => handleExportPDF(e, resume)} className="btn-primary" style={{ flex: 1, padding: '10px 12px', fontSize: '0.85rem', borderRadius: '12px', minWidth: '100px' }}>Export PDF</button>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <button onClick={(e) => handleEdit(e, resume)} className="btn-secondary" style={{ flex: 1, padding: '10px 12px', fontSize: '0.85rem', borderRadius: '12px' }}>Edit</button>
+                                                <button onClick={(e) => handleExportPDF(e, resume)} className="btn-primary" style={{ flex: 1, padding: '10px 12px', fontSize: '0.85rem', borderRadius: '12px' }}>Export PDF</button>
                                                 <button
                                                     className="btn-secondary"
-                                                    style={{ padding: '10px 14px', color: '#ef4444', borderRadius: '12px', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+                                                    style={{ padding: '10px 14px', color: '#ef4444', borderRadius: '12px', borderColor: 'rgba(239, 68, 68, 0.2)', flexShrink: 0 }}
                                                     onClick={(e) => { e.stopPropagation(); if (window.confirm('Erase this architecture?')) deleteResume(resume.id); }}
                                                 >
                                                     <Trash2 size={16} />
@@ -420,9 +435,32 @@ const Dashboard = ({ setView }) => {
                                         </button>
                                     </div>
                                 </div>
-                                <div style={{ flex: 1, overflowY: 'auto', padding: '3rem', background: '#f3f4f6', display: 'flex', justifyContent: 'center' }}>
-                                    <div style={{ background: 'white', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', width: '210mm', minHeight: '297mm', padding: '0' }}>
-                                        <TemplatePreview data={previewResume} />
+                                <div style={{
+                                    flex: 1,
+                                    overflowY: 'auto',
+                                    padding: '4rem 1rem',
+                                    background: '#f8fafc',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center'
+                                }}>
+                                    {/* Paper Wrapper */}
+                                    <div style={{
+                                        width: '210mm',
+                                        transform: 'scale(0.85)',
+                                        transformOrigin: 'top center',
+                                        marginBottom: '-15%', // Compensate for scale shrinkage at bottom
+                                        flexShrink: 0
+                                    }}>
+                                        <div style={{
+                                            background: 'white',
+                                            boxShadow: '0 40px 100px -20px rgba(0,0,0,0.2)',
+                                            borderRadius: '2px',
+                                            minHeight: '297mm',
+                                            width: '100%'
+                                        }}>
+                                            <TemplatePreview data={previewResume} />
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>

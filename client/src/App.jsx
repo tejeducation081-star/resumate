@@ -10,15 +10,27 @@ import AdminPanel from './components/AdminPanel';
 import SplashScreen from './components/SplashScreen';
 import JobsPage from './components/JobsPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 
 import useResumeStore from './store/resumeStore';
 
 function App() {
     const { user } = useAuthStore();
     const { isPreviewing } = useResumeStore();
-    const [view, setView] = useState('landing'); // 'landing', 'auth', 'dashboard', 'editor', 'templates', 'admin'
+    const [view, setView] = useState('landing'); // 'landing', 'auth', 'dashboard', 'editor', 'templates', 'admin', 'privacy', 'terms'
 
     const [showSplash, setShowSplash] = useState(true);
+
+    // Initial view based on URL params
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const urlView = params.get('view');
+        if (urlView && ['privacy', 'terms'].includes(urlView)) {
+            setView(urlView);
+            setShowSplash(false); // Skip splash for legal pages
+        }
+    }, []);
 
     // Redirect logic
     useEffect(() => {
@@ -34,8 +46,8 @@ function App() {
             {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
             {!showSplash && (
                 <>
-                    {!isPreviewing && <Navbar setView={setView} currentView={view} />}
-                    <main style={{ paddingTop: isPreviewing ? '0' : '80px' }}>
+                    {!isPreviewing && !['privacy', 'terms'].includes(view) && <Navbar setView={setView} currentView={view} />}
+                    <main style={{ paddingTop: isPreviewing || ['privacy', 'terms'].includes(view) ? '0' : '64px' }}>
                         {view === 'landing' && <LandingPage setView={setView} />}
 
                         {view === 'auth' && <AuthPage setView={setView} />}
@@ -48,6 +60,9 @@ function App() {
                                 <JobsPage setView={setView} />
                             </ErrorBoundary>
                         )}
+
+                        {view === 'privacy' && <PrivacyPolicy />}
+                        {view === 'terms' && <TermsOfService />}
 
                         {user?.isAdmin && view === 'admin' && <AdminPanel setView={setView} />}
                     </main>

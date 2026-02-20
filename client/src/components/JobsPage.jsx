@@ -10,15 +10,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Platform brand config
 const PLATFORMS = {
     all: { label: 'All Jobs', color: '#6366f1', bg: 'linear-gradient(135deg, #6366f1, #a855f7)' },
-    naukri: { label: 'Naukri', color: '#00429a', bg: 'linear-gradient(135deg, #00429a, #0066cc)', url: 'https://www.naukri.com' },
-    indeed: { label: 'Indeed', color: '#2557a7', bg: 'linear-gradient(135deg, #2557a7, #1a3f7a)', url: 'https://in.indeed.com' },
 };
 
 
 
 const SOURCE_COLORS = {
-    'Naukri': '#00429a',
-    'Indeed': '#2557a7',
     'LinkedIn': '#0a66c2',
     'TheMuse': '#5f3dc4',
     'RemoteOK': '#00b894',
@@ -70,6 +66,7 @@ const JobsPage = () => {
     const [dateFilter, setDateFilter] = useState('all');
     const [jobTypeFilter, setJobTypeFilter] = useState('');
     const [remoteOnly, setRemoteOnly] = useState(false);
+    const [jobCategory, setJobCategory] = useState('all');
     const currentQueryRef = useRef({ query: 'Software Developer', location: '', platform: 'all' });
 
     // Fetch platform deep-links
@@ -101,7 +98,7 @@ const JobsPage = () => {
                 location,
                 platform,
                 page,
-                numPages: 5   // 5 pages × 10 jobs = up to 50 per call
+                limit: 30
             });
 
             const res = await fetch(`${API_ENDPOINTS.SEARCH_JOBS}?${params}`);
@@ -168,7 +165,7 @@ const JobsPage = () => {
 
     // Load More
     const handleLoadMore = useCallback(() => {
-        const nextPage = currentPage + 5; // each call fetches 5 pages
+        const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
         const { query, location, platform } = currentQueryRef.current;
         fetchJobs({ query, location, platform, page: nextPage, append: true });
@@ -219,8 +216,27 @@ const JobsPage = () => {
             }
         }
 
+        // Job category filter (Technical vs Non-Technical)
+        if (jobCategory !== 'all') {
+            const technicalKeywords = ['developer', 'engineer', 'programmer', 'architect', 'devops', 'qa', 'tester', 'data scientist', 'data engineer', 'machine learning', 'ai researcher', 'ai ', 'ml ', 'frontend', 'backend', 'full stack', 'nodejs', 'python', 'java', 'react', 'angular', 'vue', 'database', 'sql', 'tech', 'coding', 'software', 'it ', 'system', 'network', 'security', 'cloud', 'research'];
+            const nonTechnicalKeywords = ['sales', 'marketing', 'hr', 'human resources', 'finance', 'operations', 'administration', 'admin', 'manager', 'coordinator', 'supervisor', 'officer', 'executive', 'business analyst', 'financial analyst', 'recruiter', 'consultant', 'business', 'account', 'customer', 'support', 'training', 'teacher', 'educator'];
+
+            result = result.filter(j => {
+                const title = (j.title || '').toLowerCase();
+                const company = (j.company || '').toLowerCase();
+                const searchText = title + ' ' + company;
+
+                if (jobCategory === 'technical') {
+                    return technicalKeywords.some(keyword => searchText.includes(keyword));
+                } else if (jobCategory === 'non-technical') {
+                    return nonTechnicalKeywords.some(keyword => searchText.includes(keyword));
+                }
+                return true;
+            });
+        }
+
         return result;
-    }, [jobs, activePlatform, remoteOnly, jobTypeFilter, dateFilter]);
+    }, [jobs, activePlatform, remoteOnly, jobTypeFilter, dateFilter, jobCategory]);
 
     const getTimeAgo = (dateString) => {
         if (!dateString) return 'Recently';
@@ -255,7 +271,7 @@ const JobsPage = () => {
                             </h1>
                         </div>
                         <p style={{ fontSize: '1rem', color: 'var(--fg-muted)', margin: '0 0 1.75rem', maxWidth: '600px' }}>
-                            Search jobs from <strong>Naukri</strong> and <strong>Indeed</strong> — all in one place.
+                            Discover opportunities curated from multiple sources — all in one place.
                         </p>
 
                         {/* Search Bar */}
@@ -336,51 +352,12 @@ const JobsPage = () => {
 
             <div className="container" style={{ paddingTop: '2rem' }}>
 
-                {/* ── Platform Tabs ── */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    {Object.entries(PLATFORMS).map(([key, p]) => (
-                        <motion.button
-                            key={key}
-                            whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}
-                            onClick={() => handlePlatformChange(key)}
-                            style={{
-                                padding: '9px 20px', borderRadius: '50px', fontWeight: 700,
-                                fontSize: '0.88rem', cursor: 'pointer', border: 'none',
-                                background: activePlatform === key ? p.bg : 'var(--surface)',
-                                color: activePlatform === key ? '#fff' : 'var(--fg-muted)',
-                                boxShadow: activePlatform === key ? `0 6px 20px -4px ${p.color}60` : 'none',
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            {p.label}
-                        </motion.button>
-                    ))}
-
-                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <motion.button
-                            whileHover={{ rotate: 180 }} whileTap={{ scale: 0.9 }}
-                            onClick={handleSearch}
-                            title="Refresh"
-                            style={{ padding: '9px', borderRadius: '50%', background: 'var(--surface)', border: '1px solid var(--border)', cursor: 'pointer', color: 'var(--fg-muted)', display: 'flex', alignItems: 'center' }}
-                        >
-                            <RefreshCw size={15} />
-                        </motion.button>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                            {loading ? 'Searching...' : (
-                                <>
-                                    <strong style={{ color: 'var(--fg)' }}>{processedJobs.length}</strong>
-                                    {totalEstimated > processedJobs.length && ` of ~${totalEstimated.toLocaleString()}`} jobs
-                                </>
-                            )}
-                        </span>
-                    </div>
-                </div>
-
                 {/* ── Filter Bar ── */}
                 <div style={{
                     display: 'flex', gap: '10px', marginBottom: '2rem', flexWrap: 'wrap',
                     padding: '14px 18px', borderRadius: '16px',
-                    background: 'var(--surface)', border: '1px solid var(--border)'
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    alignItems: 'center'
                 }}>
                     {/* Date Posted */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -419,6 +396,54 @@ const JobsPage = () => {
                     >
                         🌐 Remote Only
                     </button>
+
+                    {/* Job Category Filter */}
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                            onClick={() => setJobCategory(jobCategory === 'technical' ? 'all' : 'technical')}
+                            style={{
+                                padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border)',
+                                background: jobCategory === 'technical' ? 'rgba(99,102,241,0.1)' : 'var(--bg)',
+                                color: jobCategory === 'technical' ? '#6366f1' : 'var(--fg-muted)',
+                                fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            💻 Technical
+                        </button>
+                        <button
+                            onClick={() => setJobCategory(jobCategory === 'non-technical' ? 'all' : 'non-technical')}
+                            style={{
+                                padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border)',
+                                background: jobCategory === 'non-technical' ? 'rgba(168,85,247,0.1)' : 'var(--bg)',
+                                color: jobCategory === 'non-technical' ? '#a855f7' : 'var(--fg-muted)',
+                                fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            👔 Non-Technical
+                        </button>
+                    </div>
+
+                    {/* Job Count on Right */}
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <motion.button
+                            whileHover={{ rotate: 180 }} whileTap={{ scale: 0.9 }}
+                            onClick={handleSearch}
+                            title="Refresh"
+                            style={{ padding: '6px', borderRadius: '50%', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--fg-muted)', display: 'flex', alignItems: 'center' }}
+                        >
+                            <RefreshCw size={15} />
+                        </motion.button>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--fg-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            {loading ? 'Searching...' : (
+                                <>
+                                    <strong style={{ color: 'var(--fg)' }}>{processedJobs.length}</strong>
+                                    <span style={{ marginLeft: '4px' }}>jobs</span>
+                                </>
+                            )}
+                        </span>
+                    </div>
 
                 </div>
 
@@ -614,12 +639,12 @@ const JobsPage = () => {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
                             {(Array.isArray(platforms) && platforms.length > 0 ? platforms : [
-                                { name: 'Naukri.com', color: '#00429a', searchUrl: 'https://www.naukri.com', description: "India's #1 job portal", jobCount: '1 Crore+' },
-                                { name: 'Indeed India', color: '#2557a7', searchUrl: 'https://in.indeed.com', description: "World's #1 job site", jobCount: '250M+' },
+                                { name: 'Naukri.com', color: '#00429a', url: 'https://www.naukri.com', description: "India's #1 job portal", jobCount: '1 Crore+' },
+                                { name: 'Indeed India', color: '#2557a7', url: 'https://in.indeed.com', description: "World's #1 job site", jobCount: '250M+' },
                             ]).map((p, i) => (
                                 <motion.a
                                     key={i}
-                                    href={p.searchUrl || p.url}
+                                    href={p.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     whileHover={{ x: 4 }}
@@ -635,7 +660,7 @@ const JobsPage = () => {
                                     </div>
                                     <p style={{ fontSize: '0.77rem', color: 'var(--fg-muted)', margin: '0 0 10px' }}>{p.description}</p>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: p.color, background: `${p.color}12`, padding: '4px 8px', borderRadius: '6px' }}>{p.jobCount} jobs</span>
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: p.color, background: `${p.color}12`, padding: '4px 8px', borderRadius: '6px' }}>{p.jobCount || 'Live'} jobs</span>
                                         <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)' }}>Browse →</span>
                                     </div>
                                 </motion.a>

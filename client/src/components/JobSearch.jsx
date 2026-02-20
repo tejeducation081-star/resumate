@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '../config/api';
-import { X, Search, Briefcase, MapPin, DollarSign, Clock, ExternalLink, Loader, AlertCircle, ChevronDown } from 'lucide-react';
+import { X, Search, Briefcase, MapPin, DollarSign, Clock, ExternalLink, Loader, AlertCircle, ChevronDown, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const COMMON_LOCATIONS = [
@@ -23,20 +23,19 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
     const [locationInput, setLocationInput] = useState(location);
     const [platforms, setPlatforms] = useState([]);
 
-    useEffect(() => {
-        const fetchPlatforms = async () => {
-            try {
-                const res = await fetch(API_ENDPOINTS.JOB_PLATFORMS);
-                const data = await res.json();
-                if (data.success) setPlatforms(data.data);
-            } catch (e) { console.error('Failed to fetch platforms:', e); }
-        };
-        fetchPlatforms();
-    }, []);
+    const fetchPlatforms = async (q = searchInput, l = locationInput) => {
+        try {
+            const params = new URLSearchParams({ query: q, location: l });
+            const res = await fetch(`${API_ENDPOINTS.JOB_PLATFORMS}?${params}`);
+            const data = await res.json();
+            if (data.success) setPlatforms(data.data);
+        } catch (e) { console.error('Failed to fetch platforms:', e); }
+    };
 
     useEffect(() => {
-        if (searchQuery) {
-            handleSearch(searchQuery, location);
+        if (isOpen) {
+            handleSearch(searchInput, locationInput);
+            fetchPlatforms(searchInput, locationInput);
         }
     }, [isOpen]);
 
@@ -133,7 +132,10 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <Briefcase size={24} color="var(--primary)" />
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fg)', margin: 0 }}>Job Opportunities</h2>
+                        <div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fg)', margin: 0 }}>Resumate Jobs</h2>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '0.25rem 0 0 0' }}>Curated opportunities from multiple sources</p>
+                        </div>
                     </div>
                     <button
                         onClick={onClose}
@@ -211,7 +213,10 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'flex-end', width: '100%', maxWidth: '200px' }}>
                             <button
-                                onClick={() => handleSearch()}
+                                onClick={() => {
+                                    handleSearch();
+                                    fetchPlatforms();
+                                }}
                                 disabled={loading}
                                 style={{
                                     background: 'var(--primary)',
@@ -478,13 +483,6 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                             }}>
                                                 {job.id.startsWith('m') ? 'Sample' : 'Live'}
                                             </span>
-                                            <span style={{
-                                                fontSize: '0.75rem',
-                                                fontWeight: 600,
-                                                color: 'var(--muted)'
-                                            }}>
-                                                {job.source}
-                                            </span>
                                         </div>
                                     </div>
 
@@ -567,46 +565,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                         </div>
                     )}
 
-                    {!loading && !selectedJob && platforms.length > 0 && (
-                        <div style={{
-                            padding: '1.5rem',
-                            background: 'var(--surface)',
-                            borderTop: '1px solid var(--border)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.75rem'
-                        }}>
-                            <h4 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--muted)', margin: 0 }}>Direct Search on Platforms</h4>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                {platforms.map(p => (
-                                    <a
-                                        key={p.id}
-                                        href={p.url.replace('{query}', encodeURIComponent(searchInput || 'Developer')).replace('{location}', encodeURIComponent(locationInput || 'India'))}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            padding: '0.5rem 1rem',
-                                            borderRadius: '8px',
-                                            background: 'var(--bg)',
-                                            border: '1px solid var(--border)',
-                                            color: 'var(--fg)',
-                                            textDecoration: 'none',
-                                            fontSize: '0.85rem',
-                                            fontWeight: 600,
-                                            transition: 'all 0.2s'
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-                                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-                                    >
-                                        <Globe size={14} /> {p.name}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+
                 </div>
             </motion.div>
 

@@ -1,162 +1,271 @@
-// Advanced ATS Analyzer with Heuristics
+// Real ATS Content Analyzer - Analyzes actual content, not field count
 
-// Dictionary of Power Words & Action Verbs
+// Comprehensive keyword databases for analysis
 const actionVerbs = [
-    // Leadership
     'spearheaded', 'orchestrated', 'led', 'managed', 'directed', 'supervised', 'guided', 'mentored', 'trained', 'coached', 'chaired', 'oversaw',
-    // Execution
-    'implemented', 'executed', 'produced', 'built', 'created', 'developed', 'designed', 'architected', 'engineered', 'launched',
-    // Impact/Improvement
-    'improved', 'increased', 'decreased', 'optimized', 'reduced', 'maximized', 'accelerated', 'boosted', 'enhanced', 'streamlined', 'transformed',
-    // Analysis
-    'analyzed', 'audited', 'investigated', 'researched', 'forecasted', 'identified', 'modeled',
-    // Communication
-    'negotiated', 'presented', 'collaborated', 'partnered', 'persuaded', 'authorized', 'advocated'
+    'implemented', 'executed', 'produced', 'built', 'created', 'developed', 'designed', 'architected', 'engineered', 'launched', 'established',
+    'improved', 'increased', 'decreased', 'optimized', 'reduced', 'maximized', 'accelerated', 'boosted', 'enhanced', 'streamlined', 'transformed', 'revolutionized',
+    'analyzed', 'audited', 'investigated', 'researched', 'forecasted', 'identified', 'optimised', 'modeled', 'evaluated', 'assessed',
+    'negotiated', 'presented', 'collaborated', 'partnered', 'persuaded', 'advocated', 'championed'
 ];
 
-const weakWords = ['helped', 'assisted', 'responsible for', 'worked on', 'participated in', 'various'];
+const technicalKeywords = [
+    'python', 'java', 'javascript', 'react', 'nodejs', 'sql', 'aws', 'azure', 'docker', 'kubernetes', 'git', 'ci/cd', 'api', 'rest',
+    'html', 'css', 'typescript', 'angular', 'vue', 'mongodb', 'postgresql', 'mysql', 'redis', 'elasticsearch', 'jenkins', 'terraform',
+    'agile', 'scrum', 'jira', 'linux', 'windows', 'devops', 'microservices', 'cloud', 'machine learning', 'data analysis'
+];
+
+const softSkills = [
+    'communication', 'leadership', 'teamwork', 'collaboration', 'problem-solving', 'critical thinking', 'creativity',
+    'time management', 'project management', 'negotiation', 'public speaking', 'stakeholder management', 'adaptability'
+];
+
+const weakWords = ['helped', 'assisted', 'responsible for', 'worked on', 'participated', 'involved'];
+
+// Helper: Analyze text quality
+const analyzeTextQuality = (text) => {
+    if (!text || text.trim().length === 0) return 0;
+    
+    const length = text.trim().length;
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    
+    // Scoring based on content depth
+    let qualityScore = 0;
+    
+    // Length matters (min 30 chars is baseline)
+    if (length > 30) qualityScore += 15;
+    if (length > 80) qualityScore += 10;
+    if (length > 150) qualityScore += 10;
+    
+    // Sentence structure (variety is good)
+    if (sentences.length > 1) qualityScore += 10;
+    if (sentences.length > 2) qualityScore += 5;
+    
+    // Word count (showing detail)
+    const avgWordsPerSentence = words.length / sentences.length;
+    if (avgWordsPerSentence > 10 && avgWordsPerSentence < 25) qualityScore += 15; // Goldilocks zone
+    
+    return Math.min(50, qualityScore);
+};
+
+// Helper: Count keyword matches
+const countKeywordMatches = (text, keywords) => {
+    if (!text) return 0;
+    const lowerText = text.toLowerCase();
+    return keywords.filter(kw => lowerText.includes(kw.toLowerCase())).length;
+};
+
+// Helper: Detect metrics in text
+const extractMetrics = (text) => {
+    if (!text) return [];
+    const metricRegex = /(\d+(\.\d+)?%|\$\d+[kmb]?|\d+x increase|\d+\+?\s*(users|clients|customers|projects|downloads|revenue|profit))/gi;
+    return text.match(metricRegex) || [];
+};
+
+// Helper: Check spelling & grammar basics
+const analyzeWritingQuality = (text) => {
+    if (!text) return 0;
+    
+    let score = 0;
+    const lowerText = text.toLowerCase();
+    
+    // Check for weak words
+    const hasWeakWords = weakWords.some(w => lowerText.includes(w));
+    if (!hasWeakWords) score += 20;
+    
+    // Check for obvious errors (multiple spaces, extra punctuation)
+    if (!text.includes('  ')) score += 10; // No double spaces
+    if (text.match(/[.!?]{2,}/g) === null) score += 10; // No multiple punctuation
+    
+    // Check capitalization (first word should be capitalized)
+    if (text.charAt(0) === text.charAt(0).toUpperCase()) score += 5;
+    
+    return score;
+};
 
 export const calculateATSScore = (resume) => {
-    let score = 0;
-    const feedback = {
-        critical: [], // Blocking issues (missing contact info)
-        improvements: [], // Things that boost score (metrics, keywords)
-        good: [] // Things done well
-    };
-
     const { personalDetails = {}, summary = '', experience = [], education = [], skills = '' } = resume || {};
-
-    // --- 1. ESSENTIALS (20 Points) ---
-    // These are non-negotiable for ANY resume
-    let essentialsScore = 0;
-    if (personalDetails.fullName) essentialsScore += 5;
-
-    if (personalDetails.email) {
-        essentialsScore += 5;
+    
+    let totalScore = 0;
+    const feedback = { critical: [], improvements: [], good: [] };
+    const allText = `${personalDetails.fullName} ${personalDetails.email} ${personalDetails.phone} ${summary} ${experience.map(e => `${e.company} ${e.position} ${e.description}`).join(' ')} ${education.map(e => `${e.school} ${e.degree} ${e.field}`).join(' ')} ${skills}`.toLowerCase();
+    
+    // SECTION 1: CONTACT INFO (10 points) - Non-negotiable
+    let contactScore = 0;
+    if (personalDetails.fullName?.trim()) contactScore += 3;
+    if (personalDetails.email?.trim()) contactScore += 3;
+    if (personalDetails.phone?.trim()) contactScore += 2;
+    if (personalDetails.location?.trim()) contactScore += 2;
+    
+    if (contactScore < 8) {
+        feedback.critical.push('Missing contact information - These are essential for ATS to identify and reach you.');
     } else {
-        feedback.critical.push("Missing Email Address: Recruiters cannot contact you.");
+        feedback.good.push('Contact information is complete and ATS-readable.');
     }
-
-    if (personalDetails.phone) {
-        essentialsScore += 5;
-    } else {
-        feedback.critical.push("Missing Phone Number: Essential for quick screening calls.");
-    }
-
-    if (personalDetails.location) {
-        essentialsScore += 5;
-    } else {
-        feedback.improvements.push("Add Location (City, State): Helps with local searches.");
-    }
-
-    // Cap essentials at 20
-    score += essentialsScore;
-    if (essentialsScore === 20) feedback.good.push("Contact Information is complete.");
-
-
-    // --- 2. IMPACT & METRICS (30 Points) ---
-    // ATS loves numbers. "Increased revenue by 20%" >> "Increased revenue"
-    let impactScore = 0;
-
-    // Regex to find metrics: 20%, $50k, 10M, 5x, etc.
-    const metricRegex = /(\d+(\.\d+)?%|\$\d+(k|m|b)?|\d+x|\d+\+? (users|clients|customers|downloads))/gi;
-    let metricsFound = 0;
-
-    experience?.forEach(exp => {
-        const matches = exp.description?.match(metricRegex);
-        if (matches) metricsFound += matches.length;
-    });
-
-    if (metricsFound >= 3) {
-        impactScore += 30;
-        feedback.good.push(`Great job! Found ${metricsFound} quantifiable metrics.`);
-    } else if (metricsFound > 0) {
-        impactScore += 15;
-        feedback.improvements.push(`You have ${metricsFound} metrics, but aim for at least 3-4 to prove impact.`);
-    } else {
-        feedback.improvements.push("Missing Metrics: Use numbers (%, $, x) to prove your impact (e.g., 'Reduced cost by 20%').");
-    }
-    score += impactScore;
-
-
-    // --- 3. WORD CHOICE & TONE (25 Points) ---
-    let wordScore = 0;
-    let actionVerbCount = 0;
-
-    experience?.forEach(exp => {
-        const desc = exp.description?.toLowerCase() || '';
-        actionVerbs.forEach(verb => {
-            if (desc.includes(verb)) actionVerbCount++;
-        });
-    });
-
-    // Check for weak words
-    let weakWordFound = false;
-    experience?.forEach(exp => {
-        const desc = exp.description?.toLowerCase() || '';
-        weakWords.forEach(weak => {
-            if (desc.includes(weak)) weakWordFound = true;
-        });
-    });
-
-    if (weakWordFound) {
-        feedback.improvements.push(`Avoid weak phrases like 'Responsible for' or 'Helped'. Use strong action verbs instead.`);
-    }
-
-    if (actionVerbCount >= 4) {
-        wordScore += 25;
-        feedback.good.push("Strong use of action verbs.");
-    } else if (actionVerbCount > 0) {
-        wordScore += 12;
-        feedback.improvements.push("Use more Power Verbs (e.g., Spearheaded, Orchestrated) instead of passive language.");
-    } else {
-        feedback.improvements.push("No Power Verbs found. Start bullet points with strong verbs.");
-    }
-    score += wordScore;
-
-
-    // --- 4. CONTENT DEPTH & STRUCTURE (25 Points) ---
-    let structureScore = 0;
-
-    // Summary Check
-    if (summary && summary.length > 50) {
-        structureScore += 5;
-    } else {
-        feedback.improvements.push("Summary is too short. Add 2-3 sentences about your expertise and goals.");
-    }
-
-    // Skills Check
-    const skillsList = skills?.split(/[,.]/).filter(s => s.trim().length > 0) || [];
-    if (skillsList.length >= 6) {
-        structureScore += 10;
-        feedback.good.push("Good skills section.");
-    } else {
-        feedback.improvements.push("Add more skills. ATS parses these keywords to match job descriptions.");
-    }
-
-    // Experience Check
-    if (experience && experience.length > 0) {
-        structureScore += 5;
-
-        // Bullet point heuristic (looking for newlines or periods as proxy for structure)
-        const avgLength = experience.reduce((acc, curr) => acc + (curr.description?.length || 0), 0) / experience.length;
-        if (avgLength > 80) {
-            structureScore += 5;
+    totalScore += contactScore;
+    
+    // SECTION 2: PROFESSIONAL SUMMARY ANALYSIS (15 points) - Content quality
+    let summaryScore = 0;
+    if (summary && summary.trim().length > 0) {
+        summaryScore += analyzeTextQuality(summary);
+        summaryScore += analyzeWritingQuality(summary);
+        
+        // Check for keywords
+        const summaryKeywords = countKeywordMatches(summary, [...technicalKeywords, ...softSkills]);
+        if (summaryKeywords > 0) summaryScore += 10;
+        
+        if (summaryScore < 30) {
+            feedback.improvements.push('Expand your professional summary - Include your expertise, years of experience, and key skills ATS will search for.');
         } else {
-            feedback.improvements.push("Expand your experience details. Use the STAR method (Situation, Task, Action, Result).");
+            feedback.good.push('Strong professional summary with relevant keywords.');
         }
     } else {
-        feedback.critical.push("No experience listed. This is a major red flag.");
+        feedback.improvements.push('Add a professional summary - This is crucial for ATS keyword matching and helps recruiters understand your value.');
+        summaryScore = 0;
     }
-
-    score += structureScore;
-
+    totalScore += Math.min(15, summaryScore);
+    
+    // SECTION 3: EXPERIENCE ANALYSIS (35 points) - Deep content analysis
+    let experienceScore = 0;
+    if (experience && experience.length > 0) {
+        experienceScore += (experience.length > 0 ? 5 : 0);
+        
+        let totalExpQuality = 0;
+        let totalMetrics = 0;
+        let totalActionVerbs = 0;
+        
+        experience.forEach(exp => {
+            const expText = `${exp.company} ${exp.position} ${exp.description}`;
+            
+            // Analyze description depth
+            totalExpQuality += analyzeTextQuality(exp.description);
+            totalExpQuality += analyzeWritingQuality(exp.description);
+            
+            // Count metrics (numbers, percentages, etc.)
+            const metrics = extractMetrics(exp.description);
+            totalMetrics += metrics.length;
+            
+            // Count action verbs
+            const verbs = actionVerbs.filter(v => exp.description?.toLowerCase().includes(v)).length;
+            totalActionVerbs += verbs;
+            
+            // Check for STAR method indicators
+            if (exp.description?.toLowerCase().includes('result') || exp.description?.toLowerCase().includes('achieved') || exp.description?.toLowerCase().includes('delivered')) {
+                totalExpQuality += 10;
+            }
+        });
+        
+        // Calculate average quality
+        const avgQuality = Math.round(totalExpQuality / experience.length);
+        experienceScore += Math.min(15, avgQuality);
+        
+        // Metrics bonus (0-8 points)
+        if (totalMetrics >= 5) {
+            experienceScore += 8;
+            feedback.good.push(`Excellent! Found ${totalMetrics} quantifiable metrics showing impact.`);
+        } else if (totalMetrics >= 3) {
+            experienceScore += 5;
+            feedback.improvements.push(`Found ${totalMetrics} metrics. Add more numbers to show impact (e.g., "Increased sales by 30%").`);
+        } else {
+            feedback.improvements.push('Add quantifiable results to your experience - Numbers prove your impact to ATS systems.');
+        }
+        
+        // Action verbs bonus (0-7 points)
+        if (totalActionVerbs >= 6) {
+            experienceScore += 7;
+            feedback.good.push(`Strong action verbs used (${totalActionVerbs} found). Great for ATS parsing.`);
+        } else if (totalActionVerbs > 0) {
+            experienceScore += 3;
+            feedback.improvements.push(`Use ${totalActionVerbs} strong action verbs found, but aim for 6+. Replace weak words with power verbs.`);
+        } else {
+            feedback.improvements.push('Start experience bullets with power verbs like "Spearheaded", "Orchestrated", "Transformed".');
+        }
+    } else {
+        feedback.critical.push('No experience listed - This is critical for ATS evaluation. Add at least one position.');
+    }
+    totalScore += Math.min(35, experienceScore);
+    
+    // SECTION 4: SKILLS ANALYSIS (20 points) - Keyword density & relevance
+    let skillsScore = 0;
+    if (skills && skills.trim().length > 0) {
+        const skillsList = skills.split(/[,.\n;]/).map(s => s.trim()).filter(s => s.length > 0);
+        
+        // Quantity check
+        if (skillsList.length > 0) skillsScore += 5;
+        if (skillsList.length > 5) skillsScore += 5;
+        if (skillsList.length > 10) skillsScore += 5;
+        
+        // Quality check - match against known keywords
+        const technicalMatches = skillsList.filter(s => technicalKeywords.some(k => s.toLowerCase().includes(k) || k.includes(s.toLowerCase()))).length;
+        const softMatches = skillsList.filter(s => softSkills.some(k => s.toLowerCase().includes(k) || k.includes(s.toLowerCase()))).length;
+        
+        const totalMatches = technicalMatches + softMatches;
+        if (totalMatches > 0) skillsScore += 5;
+        
+        if (skillsList.length < 5) {
+            feedback.improvements.push(`Add more skills (currently ${skillsList.length}). ATS systems search for skill keywords when matching resumes to jobs.`);
+        } else {
+            feedback.good.push(`Good skill diversity (${skillsList.length} skills). Including both technical and soft skills helps ATS matching.`);
+        }
+    } else {
+        feedback.improvements.push('Add a skills section - ATS systems heavily weight skills when matching resumes to job descriptions.');
+        skillsScore = 0;
+    }
+    totalScore += Math.min(20, skillsScore);
+    
+    // SECTION 5: EDUCATION ANALYSIS (10 points) - Completeness
+    let educationScore = 0;
+    if (education && education.length > 0) {
+        educationScore += 5;
+        
+        const avgEducationQuality = education.reduce((acc, edu) => {
+            let quality = 0;
+            if (edu.school?.trim()) quality += 2;
+            if (edu.degree?.trim()) quality += 2;
+            if (edu.field?.trim()) quality += 1;
+            return acc + quality;
+        }, 0) / education.length;
+        
+        educationScore += Math.min(5, Math.round(avgEducationQuality));
+        feedback.good.push('Education section is complete.');
+    } else {
+        feedback.improvements.push('Add education information - Even if still studying, this helps ATS understand your background.');
+    }
+    totalScore += Math.min(10, educationScore);
+    
+    // SECTION 6: OVERALL KEYWORD OPTIMIZATION (10 points)
+    let keywordScore = 0;
+    const totalKeywordMatches = countKeywordMatches(allText, [...technicalKeywords, ...softSkills, ...actionVerbs]);
+    
+    if (totalKeywordMatches > 15) {
+        keywordScore = 10;
+        feedback.good.push(`Excellent keyword optimization (${totalKeywordMatches} industry keywords found). ATS will rank this highly.`);
+    } else if (totalKeywordMatches > 8) {
+        keywordScore = 7;
+        feedback.improvements.push(`Good keyword density (${totalKeywordMatches} keywords), but could add more industry-specific terms.`);
+    } else if (totalKeywordMatches > 0) {
+        keywordScore = 4;
+        feedback.improvements.push(`Limited keyword optimization (${totalKeywordMatches} keywords). Research job descriptions and include relevant industry terms.`);
+    } else {
+        feedback.improvements.push('Add industry-specific keywords to your resume - Match skills from the job description you\'re applying to.');
+    }
+    totalScore += keywordScore;
+    
+    // Final score calculation
+    const finalScore = Math.min(100, Math.max(0, totalScore));
+    
     return {
-        score: Math.min(100, Math.max(0, score)),
+        score: Math.round(finalScore),
         feedback,
         details: {
-            metrics: metricsFound,
-            actionVerbs: actionVerbCount
+            overall: `Your resume scores ${Math.round(finalScore)}/100 on ATS optimization.`,
+            analysis: {
+                contentQuality: 'Real content analysis based on depth, structure, and writing quality.',
+                keywordMatching: `${totalKeywordMatches} industry keywords detected across your resume.`,
+                metricsFound: experience.reduce((sum, exp) => sum + extractMetrics(exp.description).length, 0),
+                actionVerbsFound: experience.reduce((sum, exp) => sum + actionVerbs.filter(v => exp.description?.toLowerCase().includes(v)).length, 0)
+            }
         }
     };
 };

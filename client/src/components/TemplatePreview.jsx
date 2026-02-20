@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { templates } from '../templates/config';
 
 const TemplatePreview = ({ data }) => {
@@ -15,7 +15,7 @@ const TemplatePreview = ({ data }) => {
 
     // Default Colors
     const accentColor = customColor || styles.accent;
-    const bgColor = customBgColor || '#111827'; // Structural background (mostly for sidebar)
+    const bgColor = customBgColor || '#111827';
 
     // --- Helper Components & Styles ---
 
@@ -120,7 +120,15 @@ const TemplatePreview = ({ data }) => {
     const HeaderRenderer = () => {
         const headerInfo = (
             <div>
-                <h1 style={{ fontSize: '2.8em', fontWeight: 800, color: styles.headerStyle === 'banner' ? 'white' : (styles.headerStyle === 'split' ? '#111827' : accentColor), lineHeight: 1, letterSpacing: '-0.03em', marginBottom: '0.5em' }}>
+                <h1 style={{
+                    fontSize: '2.8em',
+                    fontWeight: 800,
+                    color: styles.headerStyle === 'banner' ? 'white' : (styles.headerStyle === 'split' ? '#111827' : accentColor),
+                    lineHeight: 1,
+                    letterSpacing: '-0.03em',
+                    marginBottom: '0.5em',
+                    transition: 'color 0.3s'
+                }}>
                     {personalDetails.fullName || 'YOUR NAME'}
                 </h1>
                 <p style={{ fontSize: '1.1em', color: styles.headerStyle === 'banner' ? 'rgba(255,255,255,0.9)' : '#6B7280', marginBottom: '0.5em' }}>
@@ -319,8 +327,8 @@ const TemplatePreview = ({ data }) => {
         const sidebarBg = customBgColor || styles.sidebarBg || '#111827';
 
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 32%) 1fr', height: '100%', position: 'relative' }}>
-                <div style={{ background: sidebarBg, color: 'white', padding: '2.5em 2em', display: 'flex', flexDirection: 'column', gap: '2em', textAlign: styles.headerStyle === 'center' ? 'center' : 'left', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 32%) 1fr', minHeight: '1123px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ background: sidebarBg, color: 'white', padding: '2.5em 2em', display: 'flex', flexDirection: 'column', gap: '2em', textAlign: styles.headerStyle === 'center' ? 'center' : 'left', position: 'sticky', top: 0, height: '100vh', flexShrink: 0, overflow: 'hidden' }}>
                     <Decorator />
                     {/* Sidebar Decor */}
                     {styles.decor === 'grid-pattern' && <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '1.25em 1.25em' }}></div>}
@@ -352,9 +360,9 @@ const TemplatePreview = ({ data }) => {
                     </div>
                 </div>
 
-                <div style={{ padding: '3em 2.5em', background: 'white', position: 'relative' }}>
+                <div style={{ padding: '3em 2.5em', background: 'white', position: 'relative', overflow: 'hidden', height: 'auto' }}>
                     {styles.roundedContent ? (
-                        <div style={{ background: 'white', padding: '2.5em', borderRadius: '2.5em 0 0 2.5em', marginLeft: '-2.5em', position: 'relative', zIndex: 1, height: '100%' }}>
+                        <div style={{ background: 'white', padding: '2.5em', borderRadius: '2.5em 0 0 2.5em', marginLeft: '-2.5em', position: 'relative', zIndex: 1 }}>
                             <HeaderRenderer />
                             {summary && (
                                 <section style={{ marginBottom: '2.5em', position: 'relative' }}>
@@ -435,7 +443,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutModern = () => (
-        <div style={{ padding: '0', height: '100%', position: 'relative' }}>
+        <div style={{ padding: '0', minHeight: '1123px', height: 'auto', position: 'relative' }}>
             <Decorator />
             <HeaderRenderer />
 
@@ -558,7 +566,7 @@ const TemplatePreview = ({ data }) => {
     const LayoutCyber = () => {
         const mainBg = customBgColor || '#0D0D0D';
         return (
-            <div style={{ background: mainBg, color: '#00FF41', minHeight: '100%', padding: '40px', fontFamily: "'JetBrains Mono', monospace" }}>
+            <div style={{ background: mainBg, color: '#00FF41', minHeight: '1123px', padding: '40px', fontFamily: "'JetBrains Mono', monospace" }}>
                 <div style={{ border: '1px solid #00FF41', padding: '30px', position: 'relative', marginBottom: '30px' }}>
                     <div style={{ position: 'absolute', top: '-12px', left: '20px', background: '#0D0D0D', padding: '0 10px', fontSize: '0.8em' }}>SYS_PROFILE_V1.0</div>
                     <h1 style={{ fontSize: '3em', fontWeight: 800, marginBottom: '10px', color: '#00FF41', textShadow: '0 0 10px #00FF4140' }}>{personalDetails.fullName || 'ROOT_USER'}</h1>
@@ -797,13 +805,13 @@ const TemplatePreview = ({ data }) => {
     const LayoutModernSilk = () => {
         const headerBg = customBgColor || '#FFF5F7';
         return (
-            <div style={{ background: headerBg, minHeight: '100%', padding: '50px', position: 'relative', fontFamily: "'Playfair Display', serif", color: '#333' }}>
+            <div style={{ background: headerBg, minHeight: '1123px', padding: '50px', position: 'relative', fontFamily: "'Playfair Display', serif", color: '#333' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '10px', background: `linear-gradient(90deg, ${accentColor}, transparent)` }}></div>
                 <div style={{ textAlign: 'center', marginBottom: '50px' }}>
                     {personalDetails.photoUrl && (
                         <img src={personalDetails.photoUrl} alt="Profile" style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', border: `4px solid white`, boxShadow: '0 10px 20px rgba(0,0,0,0.1)', marginBottom: '20px' }} />
                     )}
-                    <h1 style={{ fontSize: '3.5em', fontWeight: 700, margin: '0 0 10px 0', color: '#111827' }}>{personalDetails.fullName}</h1>
+                    <h1 style={{ fontSize: '3.5em', fontWeight: 700, margin: '0 0 10px 0', color: '#111827' }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
                     <p style={{ fontSize: '1.2em', fontStyle: 'italic', color: accentColor, letterSpacing: '2px', textTransform: 'uppercase' }}>{personalDetails.jobTitle}</p>
                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '0.9em' }}>
                         <ContactInfo />
@@ -819,7 +827,7 @@ const TemplatePreview = ({ data }) => {
                         <section>
                             <h3 style={{ fontSize: '1.2em', textTransform: 'uppercase', letterSpacing: '2px', borderBottom: `2px solid ${accentColor}`, paddingBottom: '10px', marginBottom: '20px' }}>Skills</h3>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                {skills.split(/[.,\n]/).map((s, i) => s.trim() && (
+                                {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
                                     <span key={i} style={{ background: '#F9FAFB', padding: '5px 10px', borderRadius: '4px', fontSize: '0.85em', fontFamily: "'Inter', sans-serif" }}>{s.trim()}</span>
                                 ))}
                             </div>
@@ -856,10 +864,10 @@ const TemplatePreview = ({ data }) => {
 
     const LayoutZenith = () => {
         return (
-            <div style={{ background: 'white', minHeight: '100%', padding: '60px', fontFamily: "'Inter', sans-serif", color: '#1F2937' }}>
+            <div style={{ background: 'white', minHeight: '1123px', padding: '60px', fontFamily: "'Inter', sans-serif", color: '#1F2937' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #E5E7EB', paddingBottom: '40px', marginBottom: '40px' }}>
                     <div>
-                        <h1 style={{ fontSize: '3em', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1, marginBottom: '10px', textTransform: 'uppercase' }}>{personalDetails.fullName}</h1>
+                        <h1 style={{ fontSize: '3em', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1, marginBottom: '10px', textTransform: 'uppercase', color: '#111827' }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
                         <p style={{ fontSize: '1.1em', letterSpacing: '3px', textTransform: 'uppercase', color: accentColor, fontWeight: 600 }}>{personalDetails.jobTitle}</p>
                     </div>
                     <div style={{ textAlign: 'right', fontSize: '0.9em', color: '#6B7280', lineHeight: 1.6 }}>
@@ -889,7 +897,7 @@ const TemplatePreview = ({ data }) => {
                                 <span style={{ width: '20px', height: '2px', background: accentColor }}></span> Skills
                             </h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {skills.split(/[.,\n]/).map((s, i) => s.trim() && (
+                                {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
                                     <span key={i} style={{ fontSize: '0.9em', color: '#4B5563' }}>• {s.trim()}</span>
                                 ))}
                             </div>
@@ -926,7 +934,7 @@ const TemplatePreview = ({ data }) => {
 
     const LayoutApex = () => {
         return (
-            <div style={{ background: 'white', minHeight: '100%', fontFamily: "'Inter', sans-serif" }}>
+            <div style={{ background: 'white', minHeight: '1123px', fontFamily: "'Inter', sans-serif" }}>
                 <div style={{ background: '#111827', color: 'white', padding: '50px', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', top: 0, right: 0, width: '300px', height: '100%', background: accentColor, clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)' }}></div>
                     <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -934,8 +942,8 @@ const TemplatePreview = ({ data }) => {
                             {personalDetails.photoUrl && (
                                 <img src={personalDetails.photoUrl} alt="Profile" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: `4px solid white`, marginBottom: '20px' }} />
                             )}
-                            <h1 style={{ fontSize: '3.5em', fontWeight: 800, lineHeight: 1, marginBottom: '10px' }}>{personalDetails.fullName}</h1>
-                            <p style={{ fontSize: '1.2em', opacity: 0.9, letterSpacing: '1px' }}>{personalDetails.jobTitle}</p>
+                            <h1 style={{ fontSize: '3.5em', fontWeight: 800, lineHeight: 1, marginBottom: '10px', color: 'white' }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
+                            <p style={{ fontSize: '1.2em', opacity: 0.9, letterSpacing: '1px', color: 'white' }}>{personalDetails.jobTitle || 'Software Architect'}</p>
                         </div>
                         <div style={{ textAlign: 'right', fontSize: '0.9em', lineHeight: 1.8 }}>
                             <div>{personalDetails.email}</div>
@@ -954,7 +962,7 @@ const TemplatePreview = ({ data }) => {
                         <section>
                             <h3 style={{ fontSize: '1.1em', fontWeight: 800, textTransform: 'uppercase', marginBottom: '20px', borderLeft: `5px solid ${accentColor}`, paddingLeft: '15px' }}>Skills</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {skills.split(/[.,\n]/).map((s, i) => s.trim() && (
+                                {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
                                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <div style={{ width: '100%', background: '#F3F4F6', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                                             <div style={{ width: `${Math.random() * 40 + 60}%`, background: accentColor, height: '100%' }}></div>
@@ -1001,12 +1009,15 @@ const TemplatePreview = ({ data }) => {
 
     const LayoutHorizon = () => {
         return (
-            <div style={{ display: 'flex', minHeight: '100%', fontFamily: "'Oswald', sans-serif" }}>
+            <div style={{ display: 'flex', minHeight: '1123px', fontFamily: "'Oswald', sans-serif" }}>
                 <div style={{ width: '80px', background: accentColor, flexShrink: 0 }}></div>
                 <div style={{ flex: 1, padding: '60px', background: 'white' }}>
                     <div style={{ borderBottom: '4px solid #111827', paddingBottom: '30px', marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
-                            <h1 style={{ fontSize: '4.5em', fontWeight: 700, lineHeight: 1, color: '#111827', textTransform: 'uppercase' }}>{personalDetails.fullName?.split(' ')[0]}<br /><span style={{ color: accentColor }}>{personalDetails.fullName?.split(' ')[1]}</span></h1>
+                            <h1 style={{ fontSize: '4.5em', fontWeight: 700, lineHeight: 1, color: '#111827', textTransform: 'uppercase' }}>
+                                {personalDetails.fullName?.split(' ')[0] || 'YOUR'}<br />
+                                <span style={{ color: accentColor }}>{personalDetails.fullName?.split(' ')[1] || 'NAME'}</span>
+                            </h1>
                         </div>
                         <div style={{ textAlign: 'right', paddingBottom: '10px' }}>
                             <p style={{ fontSize: '1.5em', fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase' }}>{personalDetails.jobTitle}</p>
@@ -1036,7 +1047,7 @@ const TemplatePreview = ({ data }) => {
                             <section>
                                 <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Expertise</h3>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {skills.split(/[.,\n]/).map((s, i) => s.trim() && (
+                                    {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
                                         <span key={i} style={{ background: '#111827', color: 'white', padding: '8px 15px', fontSize: '0.9em', fontFamily: "'Inter', sans-serif", letterSpacing: '1px' }}>{s.trim()}</span>
                                     ))}
                                 </div>
@@ -1072,10 +1083,10 @@ const TemplatePreview = ({ data }) => {
     const LayoutSplitVertical = () => {
         const sidebarBg = customBgColor || styles.sidebarBg || '#1E293B';
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: '40% 60%', minHeight: '100%', background: 'white' }}>
-                <div style={{ background: sidebarBg, color: 'white', padding: '80px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'sticky', top: 0, height: '100vh' }}>
-                    <h1 style={{ fontSize: '4em', fontWeight: 900, lineHeight: 1, marginBottom: '20px' }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
-                    <p style={{ fontSize: '1.2em', color: accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '40px' }}>{personalDetails.jobTitle || 'Frontend Architect'}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '40% 60%', minHeight: '1123px', background: 'white', overflow: 'hidden' }}>
+                <div style={{ background: sidebarBg, color: 'white', padding: '80px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '1123px', position: 'sticky', top: 0, flexShrink: 0 }}>
+                    <h1 style={{ fontSize: '4em', fontWeight: 900, lineHeight: 1, marginBottom: '20px', color: 'white' }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
+                    <p style={{ fontSize: '1.2em', color: accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '40px' }}>{personalDetails.jobTitle || 'Architect'}</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: 0.8 }}>
                         <div>{personalDetails.email}</div>
                         <div>{personalDetails.phone}</div>
@@ -1083,13 +1094,13 @@ const TemplatePreview = ({ data }) => {
                     </div>
                     <div style={{ marginTop: 'auto', paddingTop: '40px' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                            {skills.split(/[.,\n]/).map((s, i) => s.trim() && (
+                            {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
                                 <span key={i} style={{ border: `1px solid ${accentColor}`, color: accentColor, padding: '4px 12px', borderRadius: '20px', fontSize: '0.8em' }}>{s.trim()}</span>
                             ))}
                         </div>
                     </div>
                 </div>
-                <div style={{ padding: '80px 60px', overflowY: 'auto' }}>
+                <div style={{ padding: '80px 60px', overflowY: 'auto', overflowX: 'hidden', height: '100%' }}>
                     <section style={{ marginBottom: '60px' }}>
                         <h3 style={{ fontSize: '1.5em', fontWeight: 800, marginBottom: '40px', color: '#1E293B', borderBottom: `4px solid ${accentColor}`, display: 'inline-block' }}>Experience</h3>
                         {experience.map((exp, i) => (
@@ -1118,7 +1129,7 @@ const TemplatePreview = ({ data }) => {
     };
 
     const LayoutBlockModern = () => (
-        <div style={{ background: '#f8fafc', minHeight: '100%', padding: '40px' }}>
+        <div style={{ background: '#f8fafc', minHeight: '1123px', padding: '40px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div style={{ background: accentColor, color: 'white', padding: '40px', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <h1 style={{ fontSize: '3em', fontWeight: 900, lineHeight: 1 }}>{personalDetails.fullName || 'YOUR NAME'}</h1>
@@ -1152,7 +1163,7 @@ const TemplatePreview = ({ data }) => {
     const LayoutNewspaper = () => {
         const paperBg = customBgColor || '#fcfaf2';
         return (
-            <div style={{ background: paperBg, color: '#1a1a1a', minHeight: '100%', padding: '40px', border: '1px solid #ddd' }}>
+            <div style={{ background: paperBg, color: '#1a1a1a', minHeight: '1123px', padding: '40px', border: '1px solid #ddd' }}>
                 <div style={{ textAlign: 'center', borderBottom: '4px double #1a1a1a', paddingBottom: '20px', marginBottom: '30px' }}>
                     <div style={{ fontSize: '0.8em', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px' }}>ESTABLISHED 2024 // VOL. LXX</div>
                     <h1 style={{ fontSize: '4.5em', fontWeight: 900, fontFamily: "'Crimson Pro', serif", lineHeight: 1, letterSpacing: '-1px' }}>{personalDetails.fullName || 'THE GAZETTE'}</h1>
@@ -1193,7 +1204,7 @@ const TemplatePreview = ({ data }) => {
     };
 
     const LayoutBauhaus = () => (
-        <div style={{ background: 'white', minHeight: '100%', padding: '60px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ background: 'white', minHeight: '1123px', padding: '60px', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100px', height: '100px', background: '#E63946' }}></div>
             <div style={{ position: 'absolute', bottom: '100px', right: 0, width: '200px', height: '40px', background: '#1D3557' }}></div>
             <div style={{ position: 'absolute', top: '200px', right: '40px', width: '60px', height: '60px', borderRadius: '50%', background: '#FFB703' }}></div>
@@ -1240,7 +1251,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutRetro = () => (
-        <div style={{ background: '#000', color: '#00FF41', minHeight: '100%', padding: '40px', fontFamily: "'JetBrains Mono', monospace", border: '2px solid #00FF41' }}>
+        <div style={{ background: '#000', color: '#00FF41', minHeight: '1123px', padding: '40px', fontFamily: "'JetBrains Mono', monospace", border: '2px solid #00FF41' }}>
             <div style={{ textAlign: 'center', color: '#00FF41', marginBottom: '40px' }}>
                 <pre style={{ fontSize: '0.5em', lineHeight: 1 }}>{`
 ██████╗ ███████╗███████╗██╗   ██╗███╗   ███╗███████╗
@@ -1287,7 +1298,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutSwiss = () => (
-        <div style={{ background: '#fff', color: '#000', minHeight: '100%', padding: '80px', fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ background: '#fff', color: '#000', minHeight: '1123px', padding: '80px', fontFamily: "'Inter', sans-serif" }}>
             <h1 style={{ fontSize: '8em', fontWeight: 900, letterSpacing: '-6px', lineHeight: 0.8, marginBottom: '80px' }}>
                 {personalDetails.fullName?.split(' ')[0]}<br />
                 {personalDetails.fullName?.split(' ')[1]}
@@ -1334,7 +1345,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutIndustrial = () => (
-        <div style={{ background: '#2D2D2D', color: '#E0E0E0', minHeight: '100%', padding: '40px', border: '2px solid #444' }}>
+        <div style={{ background: '#2D2D2D', color: '#E0E0E0', minHeight: '1123px', padding: '40px', border: '2px solid #444' }}>
             <div style={{ display: 'flex', gap: '40px', alignItems: 'center', marginBottom: '40px' }}>
                 <div style={{ width: '120px', height: '120px', background: '#444', border: '5px solid #666', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3em', fontWeight: 900 }}>M</div>
                 <div>
@@ -1380,7 +1391,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutManifesto = () => (
-        <div style={{ background: 'white', color: 'black', minHeight: '100%', padding: '60px', textAlign: 'justify' }}>
+        <div style={{ background: 'white', color: 'black', minHeight: '1123px', padding: '60px', textAlign: 'justify' }}>
             <h1 style={{ fontSize: '5em', fontWeight: 900, textAlign: 'left', marginBottom: '40px', borderBottom: '20px solid black' }}>{personalDetails.fullName}</h1>
             <div style={{ fontSize: '2em', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1, marginBottom: '40px' }}>
                 I AM A SOFTWARE ARCHITECT. I BUILD SYSTEMS. I SOLVE PROBLEMS. I CREATE VALUE.
@@ -1413,7 +1424,7 @@ const TemplatePreview = ({ data }) => {
     );
 
     const LayoutOrganic = () => (
-        <div style={{ background: '#F0FFF4', color: '#2D3748', minHeight: '100%', padding: '60px', borderRadius: '40px' }}>
+        <div style={{ background: '#F0FFF4', color: '#2D3748', minHeight: '1123px', padding: '60px', borderRadius: '40px' }}>
             <div style={{ background: 'white', padding: '40px', borderRadius: '30px 30px 100px 30px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)', marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '4em', fontWeight: 800, color: '#276749' }}>{personalDetails.fullName}</h1>
                 <p style={{ fontSize: '1.5em', color: '#38A169' }}>Environmental Designer</p>
@@ -1451,21 +1462,32 @@ const TemplatePreview = ({ data }) => {
         </div>
     );
 
-    return (
-        <div id="resume-preview" style={{
-            width: '210mm',
-            minHeight: '297mm',
-            background: 'white',
-            fontFamily: data?.customFontFamily || styles.fontFamily, // PRIORITIZE CUSTOM FONT
-            color: '#374151',
-            boxShadow: '0 30px 60px rgba(0,0,0,0.1)',
-            margin: '0 auto',
-            borderRadius: '4px',
-            overflow: 'hidden',
-            position: 'relative',
-            fontSize: data?.customFontSize ? `${data.customFontSize}px` : '14px', // PRIORITIZE CUSTOM SIZE
-            borderTop: styles.layout === 'modern' ? 'none' : `8px solid ${accentColor}`
-        }}>
+    // --- Multi-Page Pagination Engine ---
+    const [pagesCount, setPagesCount] = useState(1);
+    const scoutRef = useRef(null);
+
+    // Measure height and update page count
+    useEffect(() => {
+        const updateHeight = () => {
+            if (scoutRef.current) {
+                const height = scoutRef.current.offsetHeight;
+                const needed = Math.ceil(height / 1123);
+                if (needed !== pagesCount) {
+                    setPagesCount(Math.max(1, needed));
+                }
+            }
+        };
+
+        // Initial measurement
+        updateHeight();
+
+        // Re-measure when data changes
+        const timer = setTimeout(updateHeight, 300);
+        return () => clearTimeout(timer);
+    }, [data, pagesCount]);
+
+    const renderSelectedLayout = () => (
+        <>
             {styles.layout === 'sidebar' || styles.layout === 'sidebar-big' ? <LayoutSidebar /> :
                 styles.layout === 'modern' ? <LayoutModern /> :
                     styles.layout === 'grid' ? <LayoutGrid /> :
@@ -1484,7 +1506,75 @@ const TemplatePreview = ({ data }) => {
                                                                         styles.layout === 'industrial' ? <LayoutIndustrial /> :
                                                                             styles.layout === 'manifesto' ? <LayoutManifesto /> :
                                                                                 styles.layout === 'organic' ? <LayoutOrganic /> :
-                                                                                    <LayoutClassic />}
+                                                                                    styles.layout === 'modern-silk' ? <LayoutModernSilk /> :
+                                                                                        styles.layout === 'zenith-minimal' ? <LayoutZenith /> :
+                                                                                            styles.layout === 'apex-plain' ? <LayoutApex /> :
+                                                                                                styles.layout === 'horizon-sidebar' ? <LayoutHorizon /> :
+                                                                                                    <LayoutClassic />}
+        </>
+    );
+
+    return (
+        <div id="resume-preview-outer-wrapper" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#f1f5f9', minHeight: '100%', padding: '40px 0' }}>
+
+            {/* 1. Hidden Scout for Height Measurement */}
+            <div
+                ref={scoutRef}
+                style={{
+                    position: 'absolute',
+                    top: '-10000px',
+                    left: '-10000px',
+                    width: '794px',
+                    height: 'auto',
+                    visibility: 'hidden',
+                    pointerEvents: 'none'
+                }}
+            >
+                {renderSelectedLayout()}
+            </div>
+
+            {/* 2. Global Page Break Styles */}
+            <style>{`
+                section, .section, .experience-item, .education-item, tr, p, h1, h2, h3, h4, .career-header {
+                    break-inside: avoid !important;
+                    page-break-inside: avoid !important;
+                }
+                @media print {
+                    #resume-preview-outer-wrapper { background: white !important; padding: 0 !important; }
+                    .resume-visual-page { margin-bottom: 0 !important; box-shadow: none !important; break-after: page !important; }
+                }
+            `}</style>
+
+            {/* 3. Visible Pages */}
+            {Array.from({ length: pagesCount }).map((_, index) => (
+                <div
+                    key={index}
+                    className="resume-visual-page"
+                    style={{
+                        width: '794px',
+                        height: '1123px',
+                        background: 'white',
+                        marginBottom: '30px',
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        position: 'relative'
+                    }}
+                >
+                    <div
+                        style={{
+                            transform: `translateY(-${index * 1123}px)`,
+                            width: '100%',
+                            height: 'auto',
+                            fontFamily: data?.customFontFamily || styles.fontFamily,
+                            color: '#374151',
+                            fontSize: data?.customFontSize ? `${data.customFontSize}px` : '14px',
+                            borderTop: (index === 0 && !['modern', 'modern-silk', 'zenith-minimal', 'apex-plain', 'horizon-sidebar', 'cyber', 'magazine', 'bauhaus', 'swiss', 'industrial', 'manifesto', 'organic', 'newspaper'].includes(styles.layout)) ? `8px solid ${accentColor}` : 'none',
+                        }}
+                    >
+                        {renderSelectedLayout()}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 };
