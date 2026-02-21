@@ -3,7 +3,7 @@ import { templates } from '../templates/config';
 import { ArrowUpRight } from 'lucide-react';
 
 const TemplatePreview = ({ data }) => {
-    const { personalDetails = {}, summary = '', experience = [], education = [], skills = '', projects = [], certificates = [], templateId, customColor, customBgColor } = data || {};
+    const { personalDetails = {}, summary = '', experience = [], education = [], skills = '', projects = [], certificates = [], customSections = [], templateId, customColor, customBgColor } = data || {};
 
     // Safety check for templates
     const template = templates?.find(t => t.id === templateId) || templates?.[0];
@@ -142,6 +142,13 @@ const TemplatePreview = ({ data }) => {
                 )}
             </div>
             <div style={{ fontSize: '0.9em', fontWeight: 500, color: '#4B5563' }}>{cert.issuer}</div>
+        </div>
+    );
+
+    const CustomSectionBox = ({ section }) => (
+        <div style={{ marginBottom: '1.5em' }}>
+            <SectionTitle title={section.title || 'Untitled Section'} />
+            <p style={{ fontSize: '0.9em', lineHeight: '1.6', color: '#4B5563', whiteSpace: 'pre-wrap' }}>{section.content}</p>
         </div>
     );
 
@@ -451,9 +458,10 @@ const TemplatePreview = ({ data }) => {
                                     </div>
                                 ))}
                             </section>
+                            {customSections.map((sec, i) => <CustomSectionBox key={i} section={sec} />)}
                         </>
                     )}
-                </div>
+                </div >
             </div >
         );
     };
@@ -502,6 +510,7 @@ const TemplatePreview = ({ data }) => {
                             {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
                         </div>
                     )}
+                    {customSections.map((sec, i) => <CustomSectionBox key={i} section={sec} />)}
                 </div>
             </div>
         </div>
@@ -549,6 +558,11 @@ const TemplatePreview = ({ data }) => {
                             <div style={{ marginTop: '3em' }}>
                                 <SectionTitle title="Certifications" />
                                 {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                            </div>
+                        )}
+                        {customSections.length > 0 && (
+                            <div style={{ marginTop: '3em' }}>
+                                {customSections.map((sec, i) => <CustomSectionBox key={i} section={sec} />)}
                             </div>
                         )}
                     </div>

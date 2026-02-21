@@ -23,7 +23,8 @@ import {
     User,
     Award,
     Folder,
-    Link
+    Link,
+    PlusCircle
 } from 'lucide-react';
 import TemplatePreview from './TemplatePreview';
 import JobHub from './JobHub';
@@ -61,7 +62,8 @@ const Workspace = ({ setView }) => {
         customFontFamily: '',
         customFontSize: 14,
         customColor: '',
-        customBgColor: ''
+        customBgColor: '',
+        customSections: []
     };
 
     const [formData, setFormData] = useState(currentResume ? { ...defaultState, ...currentResume } : defaultState);
@@ -220,6 +222,12 @@ const Workspace = ({ setView }) => {
                                     { id: 'education', title: 'Education', icon: Award },
                                     { id: 'certificates', title: 'Certificates', icon: CheckCircle2 },
                                     { id: 'skills', title: 'Skills', icon: Settings },
+                                    ... (formData.customSections || []).map(section => ({
+                                        id: section.id,
+                                        title: section.title || 'New Section',
+                                        icon: Layout,
+                                        isCustom: true
+                                    }))
                                 ].map(section => (
                                     <div key={section.id} style={{
                                         border: '1px solid var(--border)',
@@ -450,10 +458,51 @@ const Workspace = ({ setView }) => {
                                                                 </button>
                                                             </div>
                                                         )}
-
                                                         {section.id === 'skills' && (
                                                             <div>
                                                                 <textarea rows={3} placeholder="Comma separated skills (e.g. React, Node.js, Architecture)" value={formData.skills} onChange={e => updateFormData({ skills: e.target.value })} />
+                                                            </div>
+                                                        )}
+
+                                                        {section.isCustom && (
+                                                            <div style={{ display: 'grid', gap: '1.5rem' }}>
+                                                                <div>
+                                                                    <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px', display: 'block' }}>Section Title</label>
+                                                                    <input
+                                                                        placeholder="e.g. Languages, Hobbies, Awards"
+                                                                        value={formData.customSections.find(s => s.id === section.id)?.title || ''}
+                                                                        onChange={e => {
+                                                                            const next = [...formData.customSections];
+                                                                            const target = next.find(s => s.id === section.id);
+                                                                            if (target) target.title = e.target.value;
+                                                                            updateFormData({ customSections: next });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '8px', display: 'block' }}>Content</label>
+                                                                    <textarea
+                                                                        rows={5}
+                                                                        placeholder="Enter section content here..."
+                                                                        value={formData.customSections.find(s => s.id === section.id)?.content || ''}
+                                                                        onChange={e => {
+                                                                            const next = [...formData.customSections];
+                                                                            const target = next.find(s => s.id === section.id);
+                                                                            if (target) target.content = e.target.value;
+                                                                            updateFormData({ customSections: next });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const next = formData.customSections.filter(s => s.id !== section.id);
+                                                                        updateFormData({ customSections: next });
+                                                                        setActiveSection(null);
+                                                                    }}
+                                                                    style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                                >
+                                                                    <Trash2 size={14} /> Remove this section
+                                                                </button>
                                                             </div>
                                                         )}
                                                     </div>
@@ -462,6 +511,46 @@ const Workspace = ({ setView }) => {
                                         </AnimatePresence>
                                     </div>
                                 ))}
+
+                                <button
+                                    onClick={() => {
+                                        const newSection = {
+                                            id: 'custom-' + Date.now(),
+                                            title: '',
+                                            content: ''
+                                        };
+                                        updateFormData({ customSections: [...(formData.customSections || []), newSection] });
+                                        setActiveSection(newSection.id);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '16px',
+                                        border: '2px dashed var(--border)',
+                                        borderRadius: '12px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        cursor: 'pointer',
+                                        color: 'var(--fg-muted)',
+                                        fontWeight: 600,
+                                        transition: 'all 0.2s',
+                                        marginTop: '12px'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--accent)';
+                                        e.currentTarget.style.color = 'var(--accent)';
+                                        e.currentTarget.style.background = 'var(--accent-glow)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--border)';
+                                        e.currentTarget.style.color = 'var(--fg-muted)';
+                                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                    }}
+                                >
+                                    <PlusCircle size={18} /> Add Custom Section
+                                </button>
 
                                 <div style={{ marginTop: '24px', padding: '20px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--accent-glow) 0%, transparent 100%)', border: '1px dashed var(--accent)' }}>
                                     <h4 style={{ fontSize: '0.9rem', fontWeight: 800, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -597,10 +686,10 @@ const Workspace = ({ setView }) => {
                         )}
                     </div>
                 </div>
-            </aside>
+            </aside >
 
             {/* 70% CANVAS */}
-            <main ref={previewContainerRef} style={{
+            < main ref={previewContainerRef} style={{
                 flex: 1,
                 background: 'var(--bg-soft)',
                 display: 'flex',
@@ -611,7 +700,7 @@ const Workspace = ({ setView }) => {
                 position: 'relative'
             }}>
                 {/* Floating Preview Tools */}
-                <div style={{
+                < div style={{
                     position: 'absolute',
                     top: '24px',
                     right: '24px',
@@ -625,7 +714,7 @@ const Workspace = ({ setView }) => {
                     <button className="glass-pill" style={{ padding: '8px 16px', gap: '8px', fontSize: '0.85rem', fontWeight: 700 }} onClick={() => setShowAts(!showAts)}>
                         <Sparkles size={16} color="var(--accent)" /> ATS {calculateATSScore(formData).score}%
                     </button>
-                </div>
+                </div >
 
                 <div style={{
                     transform: `scale(${scale})`,
@@ -640,10 +729,10 @@ const Workspace = ({ setView }) => {
                         <TemplatePreview data={formData} />
                     </ErrorBoundary>
                 </div>
-            </main>
+            </main >
 
             {/* ATS Panel */}
-            <AnimatePresence>
+            < AnimatePresence >
                 {showAts && (
                     <motion.div
                         initial={{ x: 400 }}
@@ -672,7 +761,7 @@ const Workspace = ({ setView }) => {
                         </div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence >
 
             <style>{`
                 label {
@@ -705,7 +794,7 @@ const Workspace = ({ setView }) => {
                     border-radius: 100px;
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 
