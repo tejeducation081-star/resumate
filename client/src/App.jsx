@@ -61,24 +61,22 @@ function App() {
                 <>
                     {!isPreviewing && !['privacy', 'terms', 'editor'].includes(view) && <Navbar setView={setView} currentView={view} />}
                     <main style={{ paddingTop: isPreviewing || ['privacy', 'terms', 'editor'].includes(view) ? '0' : '64px' }}>
-                        {view === 'landing' && <LandingPage setView={setView} />}
+                        <ErrorBoundary>
+                            {view === 'landing' && <LandingPage setView={setView} />}
 
-                        {view === 'auth' && <AuthPage setView={setView} />}
+                            {view === 'auth' && <AuthPage setView={setView} />}
 
-                        {view === 'dashboard' && (user ? <Dashboard setView={setView} /> : <AuthPage setView={setView} />)}
-                        {view === 'editor' && <Workspace setView={setView} />}
-                        {view === 'profile' && <MasterProfile setView={setView} />}
-                        {view === 'templates' && <TemplateGallery setView={setView} />}
-                        {view === 'jobs' && (
-                            <ErrorBoundary>
-                                <JobsPage setView={setView} />
-                            </ErrorBoundary>
-                        )}
+                            {view === 'dashboard' && (user ? <Dashboard setView={setView} /> : <AuthPage setView={setView} />)}
+                            {view === 'editor' && <Workspace setView={setView} />}
+                            {view === 'profile' && <MasterProfile setView={setView} />}
+                            {view === 'templates' && <TemplateGallery setView={setView} />}
+                            {view === 'jobs' && <JobsPage setView={setView} />}
 
-                        {view === 'privacy' && <PrivacyPolicy />}
-                        {view === 'terms' && <TermsOfService />}
+                            {view === 'privacy' && <PrivacyPolicy />}
+                            {view === 'terms' && <TermsOfService />}
 
-                        {user?.isAdmin && view === 'admin' && <AdminPanel setView={setView} />}
+                            {user?.isAdmin && view === 'admin' && <AdminPanel setView={setView} />}
+                        </ErrorBoundary>
                     </main>
                 </>
             )}

@@ -19,12 +19,15 @@ import {
     Upload,
     ChevronRight,
     Sparkles,
+    PlusCircle,
+    AlertCircle,
+    XCircle,
+    Info,
+    ArrowUpCircle,
     CheckCircle2,
     User,
-    Award,
     Folder,
-    Link,
-    PlusCircle
+    Award
 } from 'lucide-react';
 import TemplatePreview from './TemplatePreview';
 import JobHub from './JobHub';
@@ -493,16 +496,25 @@ const Workspace = ({ setView }) => {
                                                                         }}
                                                                     />
                                                                 </div>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        const next = formData.customSections.filter(s => s.id !== section.id);
-                                                                        updateFormData({ customSections: next });
-                                                                        setActiveSection(null);
-                                                                    }}
-                                                                    style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                                >
-                                                                    <Trash2 size={14} /> Remove this section
-                                                                </button>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const next = formData.customSections.filter(s => s.id !== section.id);
+                                                                            updateFormData({ customSections: next });
+                                                                            setActiveSection(null);
+                                                                        }}
+                                                                        style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                                    >
+                                                                        <Trash2 size={14} /> Remove
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setActiveSection(null)}
+                                                                        className="btn-primary"
+                                                                        style={{ padding: '6px 16px', fontSize: '0.8rem', height: '32px' }}
+                                                                    >
+                                                                        Done
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </div>
@@ -574,6 +586,25 @@ const Workspace = ({ setView }) => {
                                         <input id="import-resume" type="file" hidden onChange={handleImport} accept=".pdf,.doc,.docx" />
                                     </label>
                                 </div>
+
+                                <button
+                                    onClick={() => handleSave()}
+                                    className="btn-primary"
+                                    style={{
+                                        width: '100%',
+                                        padding: '16px',
+                                        marginTop: '32px',
+                                        borderRadius: '12px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '12px',
+                                        fontWeight: 800,
+                                        fontSize: '1rem'
+                                    }}
+                                >
+                                    <CheckCircle2 size={20} /> FINISH & SAVE RESUME
+                                </button>
                             </div>
                         )}
 
@@ -758,6 +789,88 @@ const Workspace = ({ setView }) => {
                         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                             <div style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--accent)' }}>{calculateATSScore(formData).score}%</div>
                             <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fg-muted)' }}>Precision Score</div>
+                        </div>
+
+                        <div style={{ display: 'grid', gap: '1.5rem', overflowY: 'auto', maxHeight: 'calc(100vh - 350px)', paddingRight: '12px', paddingBottom: '20px' }}>
+                            {(() => {
+                                const { feedback } = calculateATSScore(formData);
+                                return (
+                                    <>
+                                        {/* CRITICAL - BAD */}
+                                        {feedback.critical.length > 0 && (
+                                            <div style={{ animation: 'slideIn 0.3s ease-out' }}>
+                                                <h4 style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 900, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    <XCircle size={16} strokeWidth={3} /> Critical Fixes (Bad)
+                                                </h4>
+                                                <div style={{ display: 'grid', gap: '12px' }}>
+                                                    {feedback.critical.map((item, i) => (
+                                                        <div key={i} style={{ padding: '14px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.15)', borderLeft: '4px solid #ef4444', fontSize: '0.85rem', color: '#1f2937', fontWeight: 500, lineHeight: 1.5 }}>
+                                                            {item.replace('BAD: ', '')}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* IMPROVEMENTS - BETTER SUGGESTIONS */}
+                                        {feedback.improvements.length > 0 && (
+                                            <div style={{ animation: 'slideIn 0.3s ease-out 0.1s both' }}>
+                                                <h4 style={{ color: '#f59e0b', fontSize: '0.75rem', fontWeight: 900, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    <ArrowUpCircle size={16} strokeWidth={3} /> Suggested Improvements (Better Suggestions)
+                                                </h4>
+                                                <div style={{ display: 'grid', gap: '12px' }}>
+                                                    {feedback.improvements.map((item, i) => (
+                                                        <div key={i} style={{ padding: '14px', background: 'rgba(245, 158, 11, 0.05)', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.15)', borderLeft: '4px solid #f59e0b', fontSize: '0.85rem', color: '#1f2937', fontWeight: 500, lineHeight: 1.5 }}>
+                                                            {item.replace('BETTER SUGGESTION: ', '')}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* OPTIMIZED - GOOD */}
+                                        {feedback.good.length > 0 && (
+                                            <div style={{ animation: 'slideIn 0.3s ease-out 0.2s both' }}>
+                                                <h4 style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 900, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                    <CheckCircle2 size={16} strokeWidth={3} /> Optimized Elements (Good)
+                                                </h4>
+                                                <div style={{ display: 'grid', gap: '12px' }}>
+                                                    {feedback.good.map((item, i) => (
+                                                        <div key={i} style={{ padding: '14px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.15)', borderLeft: '4px solid #10b981', fontSize: '0.85rem', color: '#1f2937', fontWeight: 500, lineHeight: 1.5 }}>
+                                                            {item.replace('GOOD: ', '')}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        </div>
+
+                        <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                style={{
+                                    width: '100%',
+                                    padding: '16px',
+                                    borderRadius: '12px',
+                                    background: 'var(--accent)',
+                                    color: 'white',
+                                    border: 'none',
+                                    fontWeight: 800,
+                                    fontSize: '1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '12px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 10px 20px var(--accent-glow)'
+                                }}
+                            >
+                                <CheckCircle2 size={20} /> {isSaving ? 'SAVING...' : 'FINISH & DOWNLOAD'}
+                            </button>
                         </div>
                     </motion.div>
                 )}

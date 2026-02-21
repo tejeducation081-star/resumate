@@ -691,6 +691,7 @@ const TemplatePreview = ({ data }) => {
                         )}
                     </section>
                 </div>
+                {customSections.map((sec, i) => <CustomSectionBox key={i} section={sec} />)}
             </div>
         </div>
     );
@@ -738,6 +739,17 @@ const TemplatePreview = ({ data }) => {
                                 <div style={{ fontSize: '0.8em', opacity: 0.6 }}>{edu.year}</div>
                             </div>
                         ))}
+                        {customSections.length > 0 && (
+                            <div style={{ marginTop: '30px' }}>
+                                <h3 style={{ borderBottom: '1px solid #00FF41', paddingBottom: '5px', marginBottom: '20px', fontSize: '1em' }}>MODULE_EXT_DATA</h3>
+                                {customSections.map((sec, i) => (
+                                    <div key={i} style={{ marginBottom: '20px' }}>
+                                        <div style={{ fontWeight: 700, color: '#00FF41', textTransform: 'uppercase' }}>{sec.title}</div>
+                                        <p style={{ fontSize: '0.85em', opacity: 0.8 }}>{sec.content}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -748,6 +760,16 @@ const TemplatePreview = ({ data }) => {
         <div style={{ background: '#F5F5F5', minHeight: '100%', padding: '60px', color: '#000', fontFamily: "'Playfair Display', serif" }}>
             <HeaderRenderer />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6em' }}>
+                <div>
+                    <h3 style={{ fontSize: '2em', fontWeight: 900, textTransform: 'uppercase', borderBottom: '4px solid black', marginBottom: '1.5em' }}>Experience</h3>
+                    {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
+                    {customSections.map((sec, i) => (
+                        <div key={i} style={{ marginTop: '2em' }}>
+                            <h3 style={{ fontSize: '1.5em', fontWeight: 900, textTransform: 'uppercase', marginBottom: '1em' }}>{sec.title}</h3>
+                            <p style={{ lineHeight: 1.8 }}>{sec.content}</p>
+                        </div>
+                    ))}
+                </div>
                 <div style={{ borderTop: '4px solid #000', paddingTop: '20px' }}>
                     <h3 style={{ fontSize: '2em', fontWeight: 900, marginBottom: '2em' }}>Experience</h3>
                     {experience.map((exp, i) => (
@@ -1166,9 +1188,15 @@ const TemplatePreview = ({ data }) => {
                                 {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
                             </section>
                         )}
+                        {customSections.map((sec, i) => (
+                            <section key={i} style={{ marginTop: '30px' }}>
+                                <h3 style={{ fontSize: '1.1em', fontWeight: 800, textTransform: 'uppercase', marginBottom: '30px', borderLeft: `5px solid ${accentColor}`, paddingLeft: '15px' }}>{sec.title}</h3>
+                                <p style={{ lineHeight: 1.6, color: '#4B5563', whiteSpace: 'pre-wrap' }}>{sec.content}</p>
+                            </section>
+                        ))}
                     </div>
                 </div>
-            </div>
+            </div >
         );
     };
 
@@ -1180,8 +1208,8 @@ const TemplatePreview = ({ data }) => {
                     <div style={{ borderBottom: '4px solid #111827', paddingBottom: '30px', marginBottom: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
                             <h1 style={{ fontSize: '4.5em', fontWeight: 700, lineHeight: 1, color: '#111827', textTransform: 'uppercase' }}>
-                                {personalDetails.fullName?.split(' ')[0] || 'YOUR'}<br />
-                                <span style={{ color: accentColor }}>{personalDetails.fullName?.split(' ')[1] || 'NAME'}</span>
+                                {(personalDetails.fullName || '').split(' ')[0] || 'YOUR'}<br />
+                                <span style={{ color: accentColor }}>{(personalDetails.fullName || '').split(' ')[1] || 'NAME'}</span>
                             </h1>
                         </div>
                         <div style={{ textAlign: 'right', paddingBottom: '10px' }}>
@@ -1200,12 +1228,20 @@ const TemplatePreview = ({ data }) => {
                                 </div>
                             </section>
                             <section style={{ marginBottom: '50px' }}>
+                                <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Skills</h3>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                    {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
+                                        <span key={i} style={{ border: `1px solid ${accentColor}`, color: '#111827', padding: '5px 15px', textTransform: 'uppercase', fontSize: '0.9em', fontWeight: 600 }}>{s.trim()}</span>
+                                    ))}
+                                </div>
+                            </section>
+                            <section style={{ marginBottom: '50px' }}>
                                 <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Education</h3>
                                 {education.map((edu, i) => (
-                                    <div key={i} style={{ marginBottom: '20px' }}>
-                                        <h4 style={{ fontSize: '1.2em' }}>{edu.school}</h4>
-                                        <div style={{ fontFamily: "'Inter', sans-serif", color: '#666' }}>{edu.degree}</div>
-                                        <div style={{ fontFamily: "'Inter', sans-serif", color: '#999', fontSize: '0.9em' }}>{edu.year}</div>
+                                    <div key={i} style={{ marginBottom: '25px' }}>
+                                        <h4 style={{ fontSize: '1.2em', fontWeight: 600 }}>{edu.school}</h4>
+                                        <div style={{ color: '#666' }}>{edu.degree}</div>
+                                        <div style={{ color: accentColor, fontWeight: 700 }}>{edu.year}</div>
                                     </div>
                                 ))}
                             </section>
@@ -1215,14 +1251,12 @@ const TemplatePreview = ({ data }) => {
                                     {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
                                 </section>
                             )}
-                            <section>
-                                <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Expertise</h3>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {(skills || '').split(/[.,\n]/).map((s, i) => s.trim() && (
-                                        <span key={i} style={{ background: '#111827', color: 'white', padding: '8px 15px', fontSize: '0.9em', fontFamily: "'Inter', sans-serif", letterSpacing: '1px' }}>{s.trim()}</span>
-                                    ))}
-                                </div>
-                            </section>
+                            {customSections.map((sec, i) => (
+                                <section key={i} style={{ marginBottom: '50px' }}>
+                                    <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>{sec.title}</h3>
+                                    <p style={{ fontFamily: "'Inter', sans-serif", lineHeight: 1.8, color: '#4B5563', whiteSpace: 'pre-wrap' }}>{sec.content}</p>
+                                </section>
+                            ))}
                         </div>
 
                         <div>
@@ -1400,8 +1434,8 @@ const TemplatePreview = ({ data }) => {
 
             <div style={{ position: 'relative', zIndex: 1 }}>
                 <h1 style={{ fontSize: '6em', fontWeight: 900, color: '#1D3557', lineHeight: 0.8, marginBottom: '60px' }}>
-                    {personalDetails.fullName?.split(' ')[0]}<br />
-                    <span style={{ color: '#E63946' }}>{personalDetails.fullName?.split(' ')[1]}</span>
+                    {(personalDetails.fullName || '').split(' ')[0]}<br />
+                    <span style={{ color: '#E63946' }}>{(personalDetails.fullName || '').split(' ')[1]}</span>
                 </h1>
                 <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '40px' }}>
                     <div style={{ fontSize: '1.2em', fontWeight: 900, transform: 'rotate(-90deg)', transformOrigin: 'top right', width: '200px', height: '150px', textAlign: 'right', translate: '-150px 0' }}>INFO_DATA</div>
