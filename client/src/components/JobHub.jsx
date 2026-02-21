@@ -219,28 +219,28 @@ const JobHub = ({ isEmbedded = false }) => {
                                 <div style={{ width: '64px', height: '64px', background: 'var(--accent)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
                                     <Building size={32} />
                                 </div>
-                                <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '1rem', lineHeight: 1.2 }}>{selectedJob.title}</h2>
-                                <p style={{ fontSize: '1.1rem', color: 'var(--fg-muted)', marginBottom: '2.5rem' }}>{selectedJob.company} • {selectedJob.location}</p>
+                                <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '1rem', lineHeight: 1.2, color: 'white' }}>{selectedJob.title}</h2>
+                                <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', marginBottom: '2.5rem' }}>{selectedJob.company} • {selectedJob.location}</p>
 
                                 <div style={{ display: 'grid', gap: '2rem' }}>
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                         <div style={{ color: 'var(--accent)' }}><Target size={24} /></div>
                                         <div>
-                                            <div style={{ fontWeight: 800, marginBottom: '4px' }}>Expertise Score</div>
+                                            <div style={{ fontWeight: 800, marginBottom: '4px', color: 'white' }}>Expertise Score</div>
                                             <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>Your profile matches 94% of core requirements for this position.</div>
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', gap: '16px' }}>
                                         <div style={{ color: 'var(--accent)' }}><Clock size={24} /></div>
                                         <div>
-                                            <div style={{ fontWeight: 800, marginBottom: '4px' }}>Engagement Window</div>
+                                            <div style={{ fontWeight: 800, marginBottom: '4px', color: 'white' }}>Engagement Window</div>
                                             <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>Posted 2 days ago. Average HR response time: 48 hours.</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div style={{ marginTop: '4rem', padding: '2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem' }}>Description</h4>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '1rem', color: 'white' }}>Description</h4>
                                     <p style={{ fontSize: '0.95rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.7)' }}>{selectedJob.description || "Leading the charge in architectural excellence. We're looking for visionary engineers to join our primary growth cluster as we scale our neural networks through 2024..."}</p>
                                 </div>
                             </div>
