@@ -202,7 +202,7 @@ const TemplateGallery = ({ setView }) => {
                             <button onClick={() => { setSelectedTemplate(null); setIsPreviewing(false); }} style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, background: 'rgba(255,255,255,0.8)', padding: 8, borderRadius: '50%', cursor: 'pointer', border: 'none' }}><X size={24} color="#374151" /></button>
 
                             <div className="mobile-stack" style={{ width: '100%', height: '100%', overflow: 'hidden', alignItems: 'stretch' }}>
-                                <div style={{ width: '100%', maxWidth: '420px', padding: 'clamp(1.5rem, 5vw, 2.5rem)', background: '#FFFFFF', display: 'flex', flexDirection: 'column', borderRight: '1px solid #E5E7EB', zIndex: 2, margin: '0 auto' }}>
+                                <div style={{ width: '100%', maxWidth: '420px', padding: 'clamp(1.5rem, 5vw, 2.5rem)', background: '#FFFFFF', display: 'flex', flexDirection: 'column', borderRight: '1px solid #E5E7EB', zIndex: 2, margin: '0 auto', overflowY: 'auto' }}>
                                     <div style={{ marginBottom: '2rem' }}>
                                         <h4 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: '#9CA3AF', letterSpacing: '0.1em', marginBottom: '8px' }}>Selected Template</h4>
                                         <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', fontWeight: 800, color: '#111827', lineHeight: 1.1 }}>{selectedTemplate.name}</h1>

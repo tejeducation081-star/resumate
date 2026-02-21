@@ -6,7 +6,7 @@ import { Plus, Search, FileText, Zap, TrendingUp, Briefcase, Trash2, Layout, Mor
 import { motion, AnimatePresence } from 'framer-motion';
 import TemplatePreview from './TemplatePreview';
 import { calculateATSScore } from '../utils/atsAnalyzer';
-import JobSearch from './JobSearch';
+// import JobSearch from './JobSearch'; // Removed Job Hub
 
 
 const Dashboard = ({ setView }) => {
@@ -17,7 +17,7 @@ const Dashboard = ({ setView }) => {
 
     // Preview Modal State
     const [previewResume, setPreviewResume] = useState(null);
-    const [isJobSearchOpen, setIsJobSearchOpen] = useState(false);
+    // const [isJobSearchOpen, setIsJobSearchOpen] = useState(false); // Removed Job Hub
 
     useEffect(() => {
         if (isPreviewing) {
@@ -468,13 +468,7 @@ const Dashboard = ({ setView }) => {
                     )}
                 </AnimatePresence>
 
-                {/* Job Search Modal */}
-                <JobSearch
-                    isOpen={isJobSearchOpen}
-                    onClose={() => setIsJobSearchOpen(false)}
-                    searchQuery={previewResume?.personalDetails?.jobTitle || ''}
-                    location={previewResume?.personalDetails?.location || ''}
-                />
+                {/* Job Search Modal Removed */}
 
             </div>
         </div >

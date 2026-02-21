@@ -402,3 +402,14 @@ textarea:focus {
   background: var(--accent);
   color: white;
 }
+
+.mobile-stack {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+@media (min-width: 769px) {
+  .mobile-stack {
+    flex-direction: row !important;
+  }
+}

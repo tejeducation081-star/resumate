@@ -30,6 +30,35 @@ const User = sequelize.define('User', {
     premiumExpiresAt: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    // Master Profile Fields
+    title: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    bio: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    skills: {
+        type: DataTypes.JSON, // Stores array of strings
+        allowNull: true
+    },
+    industry: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    targetTitle: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    location: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    salary: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     hooks: {

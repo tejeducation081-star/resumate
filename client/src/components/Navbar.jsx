@@ -76,7 +76,7 @@ const Navbar = ({ setView, currentView }) => {
         ? [{ id: 'admin', label: 'Admin Panel' }]
         : [
             { id: 'dashboard', label: 'Dashboard' },
-            { id: 'jobs', label: 'Get Jobs' },
+            { id: 'profile', label: 'Master Profile' }
         ];
 
     const scrollableIds = ['landing', 'workflow', 'faq', 'contact'];

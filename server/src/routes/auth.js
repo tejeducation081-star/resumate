@@ -125,7 +125,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.get('/me', authMiddleware, async (req, res) => {
     try {
         const user = await User.findByPk(req.userId, {
-            attributes: ['id', 'username', 'email', 'isAdmin', 'isPremium', 'premiumExpiresAt']
+            attributes: ['id', 'username', 'email', 'isAdmin', 'isPremium', 'premiumExpiresAt', 'title', 'bio', 'skills', 'industry', 'targetTitle', 'location', 'salary']
         });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
@@ -133,6 +133,39 @@ router.get('/me', authMiddleware, async (req, res) => {
         res.json({ user });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// Master Profile Routes
+router.get('/profile', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.userId, {
+            attributes: ['title', 'bio', 'skills', 'industry', 'targetTitle', 'location', 'salary']
+        });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.put('/profile', authMiddleware, async (req, res) => {
+    try {
+        const { title, bio, skills, industry, targetTitle, location, salary } = req.body;
+        const user = await User.findByPk(req.userId);
+
+        await user.update({
+            title,
+            bio,
+            skills,
+            industry,
+            targetTitle,
+            location,
+            salary
+        });
+
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
 });
 
