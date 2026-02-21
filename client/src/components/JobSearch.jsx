@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '../config/api';
-import { X, Search, Briefcase, MapPin, DollarSign, Clock, ExternalLink, Loader, AlertCircle, ChevronDown, Globe } from 'lucide-react';
+import { X, Search, Briefcase, MapPin, DollarSign, Clock, ExternalLink, Loader, AlertCircle, ChevronDown, Globe, ChevronLeft, Building, Calendar, Zap, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const COMMON_LOCATIONS = [
@@ -38,6 +38,17 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
             fetchPlatforms(searchInput, locationInput);
         }
     }, [isOpen]);
+
+    // Auto-refresh jobs every 5 minutes when modal is open
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const refreshInterval = setInterval(() => {
+            handleSearch(searchInput, locationInput);
+        }, 5 * 60 * 1000); // 5 minutes
+
+        return () => clearInterval(refreshInterval);
+    }, [isOpen, searchInput, locationInput]);
 
     const handleSearch = async (query = searchInput, loc = locationInput) => {
         if (!query.trim()) {
@@ -128,10 +139,10 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                     alignItems: 'center',
                     padding: '1.5rem',
                     borderBottom: '1px solid var(--border)',
-                    background: 'linear-gradient(135deg, var(--primary) 0%, rgba(99, 102, 241, 0.1) 100%)'
+                    background: 'linear-gradient(135deg, var(--accent) 0%, rgba(99, 102, 241, 0.1) 100%)'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Briefcase size={24} color="var(--primary)" />
+                        <Briefcase size={24} color="var(--accent)" />
                         <div>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fg)', margin: 0 }}>Resumate Jobs</h2>
                             <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '0.25rem 0 0 0' }}>Curated opportunities from multiple sources</p>
@@ -219,7 +230,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                 }}
                                 disabled={loading}
                                 style={{
-                                    background: 'var(--primary)',
+                                    background: 'var(--accent)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
@@ -289,131 +300,168 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                     )}
 
                     {!loading && selectedJob ? (
-                        // Job Detail View
-                        <div style={{
-                            padding: '2rem',
-                            height: '100%',
-                            overflowY: 'auto'
-                        }}>
-                            <button
-                                onClick={() => setSelectedJob(null)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--primary)',
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 600,
-                                    marginBottom: '1.5rem',
-                                    padding: 0,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                ← Back to Jobs
-                            </button>
-
+                        // ── Premium Job Detail View ──
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                            {/* Sub-Header */}
                             <div style={{
-                                background: 'var(--surface)',
-                                borderRadius: '12px',
-                                padding: '2rem',
-                                border: '1px solid var(--border)'
+                                padding: '1rem 2rem', borderBottom: '1px solid var(--border)',
+                                display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-soft)'
                             }}>
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--fg)', margin: '0 0 0.5rem 0' }}>
-                                        {selectedJob.title}
-                                    </h3>
-                                    <p style={{ fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 600, margin: 0 }}>
-                                        {selectedJob.company}
-                                    </p>
-                                </div>
-
-                                <div className="responsive-grid" style={{
-                                    gap: '1rem',
-                                    marginBottom: '2rem',
-                                    padding: '1.5rem',
-                                    background: 'var(--bg)',
-                                    borderRadius: '8px'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--fg)' }}>
-                                        <MapPin size={18} color="var(--primary)" />
-                                        <span>{selectedJob.location}</span>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--fg)' }}>
-                                        <Briefcase size={18} color="var(--primary)" />
-                                        <span>{selectedJob.jobType}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--fg)' }}>
-                                        <Clock size={18} color="var(--primary)" />
-                                        <span>Posted: {new Date(selectedJob.postedDate).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-
-                                <div style={{ marginBottom: '2rem' }}>
-                                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.75rem' }}>Description</h4>
-                                    <p style={{
-                                        color: 'var(--muted)',
-                                        lineHeight: 1.6,
-                                        whiteSpace: 'pre-wrap',
-                                        wordWrap: 'break-word'
-                                    }}>
-                                        {selectedJob.description || 'No description available'}
-                                    </p>
-                                </div>
-
-                                {selectedJob.skills && selectedJob.skills.length > 0 && (
-                                    <div style={{ marginBottom: '2rem' }}>
-                                        <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--fg)', marginBottom: '0.75rem' }}>Required Skills</h4>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                            {selectedJob.skills.slice(0, 8).map((skill, idx) => (
-                                                <span
-                                                    key={idx}
-                                                    style={{
-                                                        background: 'var(--primary)',
-                                                        color: 'white',
-                                                        padding: '0.5rem 1rem',
-                                                        borderRadius: '20px',
-                                                        fontSize: '0.85rem',
-                                                        fontWeight: 600
-                                                    }}
-                                                >
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <a
-                                    href={selectedJob.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <motion.button
+                                    whileHover={{ x: -4 }}
+                                    onClick={() => setSelectedJob(null)}
                                     style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '0.75rem',
-                                        background: 'var(--primary)',
-                                        color: 'white',
-                                        padding: '1rem 2rem',
-                                        borderRadius: '8px',
-                                        textDecoration: 'none',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
+                                        background: 'transparent', border: 'none', color: 'var(--accent)',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                                        fontSize: '0.9rem', fontWeight: 700
                                     }}
                                 >
-                                    Apply Now <ExternalLink size={18} />
-                                </a>
+                                    <ChevronLeft size={20} /> Back to Search
+                                </motion.button>
+                            </div>
+
+                            {/* Detail Content */}
+                            <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+                                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                                    {/* Main Title Section */}
+                                    <div style={{ marginBottom: '2.5rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', gap: '1rem' }}>
+                                            <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--fg)', margin: 0, lineHeight: 1.2 }}>
+                                                {selectedJob.title}
+                                            </h1>
+                                            <span style={{
+                                                padding: '6px 14px', borderRadius: '8px',
+                                                background: 'var(--accent)18', color: 'var(--accent)',
+                                                fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap'
+                                            }}>
+                                                {selectedJob.source || 'Resumate Jobs'}
+                                            </span>
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent)10', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Building size={16} color="var(--accent)" />
+                                                </div>
+                                                <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--fg)' }}>{selectedJob.company}</span>
+                                            </div>
+                                            {selectedJob.isRemote && (
+                                                <span style={{ padding: '4px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.1)', color: '#10b981', fontSize: '0.75rem', fontWeight: 800 }}>REMOTE</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Metadata Grid */}
+                                    <div style={{
+                                        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                                        gap: '1rem', padding: '1.5rem', background: 'var(--bg)',
+                                        borderRadius: '20px', border: '1px solid var(--border)', marginBottom: '2.5rem'
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <MapPin size={18} style={{ color: 'var(--fg-muted)' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--fg-muted)', margin: 0, textTransform: 'uppercase', fontWeight: 700 }}>Location</p>
+                                                <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>{selectedJob.location}</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <Clock size={18} style={{ color: 'var(--fg-muted)' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--fg-muted)', margin: 0, textTransform: 'uppercase', fontWeight: 700 }}>Type</p>
+                                                <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>{selectedJob.jobType || 'Full-time'}</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <Calendar size={18} style={{ color: 'var(--fg-muted)' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--fg-muted)', margin: 0, textTransform: 'uppercase', fontWeight: 700 }}>Posted</p>
+                                                <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>{new Date(selectedJob.postedDate).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                        {selectedJob.salary && selectedJob.salary !== 'Not specified' && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <Zap size={18} style={{ color: 'var(--accent)' }} />
+                                                <div>
+                                                    <p style={{ fontSize: '0.65rem', color: 'var(--fg-muted)', margin: 0, textTransform: 'uppercase', fontWeight: 700 }}>Compensation</p>
+                                                    <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>{selectedJob.salary}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Description */}
+                                    <div style={{ marginBottom: '3rem' }}>
+                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div style={{ width: '4px', height: '20px', background: 'var(--accent)', borderRadius: '2px' }} />
+                                            Job Description
+                                        </h3>
+                                        <div style={{
+                                            color: 'var(--fg-muted)', fontSize: '1.05rem', lineHeight: 1.8,
+                                            whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                                            padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px',
+                                            border: '1px solid var(--border)'
+                                        }}>
+                                            {selectedJob.description}
+                                        </div>
+                                    </div>
+
+                                    {/* Skills Tags */}
+                                    {selectedJob.skills && selectedJob.skills.length > 0 && (
+                                        <div style={{ marginBottom: '3rem' }}>
+                                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--fg)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{ width: '4px', height: '20px', background: '#ec4899', borderRadius: '2px' }} />
+                                                Required Competencies
+                                            </h3>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                                {selectedJob.skills.map((skill, i) => (
+                                                    <span key={i} style={{
+                                                        padding: '10px 20px', borderRadius: '12px',
+                                                        background: 'var(--bg)', border: '1px solid var(--border)',
+                                                        color: 'var(--fg)', fontSize: '0.85rem', fontWeight: 650,
+                                                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+                                                    }}>
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Final CTA */}
+                                    <div style={{
+                                        padding: '2.5rem',
+                                        background: 'linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(168,85,247,0.05) 100%)',
+                                        borderRadius: '24px',
+                                        border: '1px solid var(--accent)20',
+                                        textAlign: 'center',
+                                        marginBottom: '2rem'
+                                    }}>
+                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Ready to take the next step?</h4>
+                                        <p style={{ color: 'var(--fg-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Apply directly on the source platform to start your journey.</p>
+                                        <motion.a
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            href={selectedJob.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '10px',
+                                                padding: '16px 40px',
+                                                background: 'var(--accent)',
+                                                color: 'white',
+                                                borderRadius: '14px',
+                                                textDecoration: 'none',
+                                                fontWeight: 800,
+                                                fontSize: '1rem',
+                                                boxShadow: '0 10px 25px -5px var(--accent-glow)'
+                                            }}
+                                        >
+                                            Apply on {selectedJob.source || 'Platform'} <ArrowUpRight size={20} />
+                                        </motion.a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ) : !loading && jobs.length === 0 ? (
@@ -450,7 +498,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.background = 'var(--bg)';
-                                        e.currentTarget.style.borderColor = 'var(--primary)';
+                                        e.currentTarget.style.borderColor = 'var(--accent)';
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.background = 'var(--surface)';
@@ -467,13 +515,13 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                             <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--fg)', margin: 0, marginBottom: '0.25rem' }}>
                                                 {job.title}
                                             </h4>
-                                            <p style={{ fontSize: '0.95rem', color: 'var(--primary)', fontWeight: 600, margin: 0 }}>
+                                            <p style={{ fontSize: '0.95rem', color: 'var(--accent)', fontWeight: 600, margin: 0 }}>
                                                 {job.company}
                                             </p>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
                                             <span style={{
-                                                background: job.id.startsWith('m') ? '#6B7280' : 'var(--primary)',
+                                                background: job.id.startsWith('m') ? '#6B7280' : 'var(--accent)',
                                                 color: 'white',
                                                 padding: '0.25rem 0.75rem',
                                                 borderRadius: '20px',
@@ -519,36 +567,30 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                     </p>
 
                                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                        <a
-                                            href={job.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            onClick={(e) => e.stopPropagation()}
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedJob(job);
+                                            }}
                                             style={{
-                                                background: 'transparent',
-                                                border: '1px solid var(--primary)',
-                                                color: 'var(--primary)',
-                                                padding: '0.4rem 1rem',
-                                                borderRadius: '6px',
+                                                background: 'var(--accent)10',
+                                                border: '1px solid var(--accent)30',
+                                                color: 'var(--accent)',
+                                                padding: '0.6rem 1.2rem',
+                                                borderRadius: '8px',
                                                 fontSize: '0.8rem',
-                                                fontWeight: 700,
-                                                textDecoration: 'none',
-                                                transition: 'all 0.2s',
+                                                fontWeight: 800,
+                                                cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: '4px'
-                                            }}
-                                            onMouseEnter={e => {
-                                                e.currentTarget.style.background = 'var(--primary)';
-                                                e.currentTarget.style.color = 'white';
-                                            }}
-                                            onMouseLeave={e => {
-                                                e.currentTarget.style.background = 'transparent';
-                                                e.currentTarget.style.color = 'var(--primary)';
+                                                gap: '6px',
+                                                transition: 'all 0.2s'
                                             }}
                                         >
-                                            Quick Apply <ExternalLink size={12} />
-                                        </a>
+                                            View Details <ChevronRight size={14} />
+                                        </motion.button>
                                     </div>
 
                                     <div style={{
@@ -558,7 +600,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                         opacity: 0,
                                         transition: 'opacity 0.2s ease'
                                     }}>
-                                        <span style={{ color: 'var(--primary)', fontWeight: 600 }}>View Details →</span>
+                                        <span style={{ color: 'var(--accent)', fontWeight: 600 }}>View Details →</span>
                                     </div>
                                 </motion.div>
                             ))}
