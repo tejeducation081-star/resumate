@@ -21,7 +21,9 @@ import {
     Sparkles,
     CheckCircle2,
     User,
-    Award
+    Award,
+    Folder,
+    Link
 } from 'lucide-react';
 import TemplatePreview from './TemplatePreview';
 import JobHub from './JobHub';
@@ -53,6 +55,8 @@ const Workspace = ({ setView }) => {
         experience: [],
         education: [],
         skills: profile?.skills?.join(', ') || '',
+        projects: [],
+        certificates: [],
         templateId: templates?.[0]?.id || 'elegant-pink-modern',
         customFontFamily: '',
         customFontSize: 14,
@@ -212,7 +216,9 @@ const Workspace = ({ setView }) => {
                                     { id: 'personal', title: 'Personal Details', icon: User },
                                     { id: 'summary', title: 'Professional Summary', icon: FileText },
                                     { id: 'experience', title: 'Work Experience', icon: Briefcase },
+                                    { id: 'projects', title: 'Projects', icon: Folder },
                                     { id: 'education', title: 'Education', icon: Award },
+                                    { id: 'certificates', title: 'Certificates', icon: CheckCircle2 },
                                     { id: 'skills', title: 'Skills', icon: Settings },
                                 ].map(section => (
                                     <div key={section.id} style={{
@@ -265,7 +271,7 @@ const Workspace = ({ setView }) => {
                                                                     <input value={formData.personalDetails.email} onChange={e => updateFormData({ personalDetails: { ...formData.personalDetails, email: e.target.value } })} />
                                                                 </div>
                                                                 <div>
-                                                                    <label>Target Role</label>
+                                                                    <label>Job Title</label>
                                                                     <input value={formData.personalDetails.jobTitle} onChange={e => updateFormData({ personalDetails: { ...formData.personalDetails, jobTitle: e.target.value } })} />
                                                                 </div>
                                                             </div>
@@ -277,8 +283,177 @@ const Workspace = ({ setView }) => {
                                                         )}
                                                         {/* Adding more sections later */}
                                                         {section.id === 'experience' && (
-                                                            <div style={{ textAlign: 'center', padding: '20px' }}>
-                                                                <button className="btn-secondary" style={{ width: '100%' }}>Add Experience Record</button>
+                                                            <div style={{ display: 'grid', gap: '20px' }}>
+                                                                {formData.experience.map((exp, idx) => (
+                                                                    <div key={idx} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: '12px', background: 'white', position: 'relative' }}>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const newExp = [...formData.experience];
+                                                                                newExp.splice(idx, 1);
+                                                                                updateFormData({ experience: newExp });
+                                                                            }}
+                                                                            style={{ position: 'absolute', top: '12px', right: '12px', color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                        >
+                                                                            <Trash2 size={14} />
+                                                                        </button>
+                                                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                                                            <input placeholder="Company" value={exp.company} onChange={e => {
+                                                                                const newExp = [...formData.experience];
+                                                                                newExp[idx].company = e.target.value;
+                                                                                updateFormData({ experience: newExp });
+                                                                            }} />
+                                                                            <input placeholder="Job Title" value={exp.position} onChange={e => {
+                                                                                const newExp = [...formData.experience];
+                                                                                newExp[idx].position = e.target.value;
+                                                                                updateFormData({ experience: newExp });
+                                                                            }} />
+                                                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                                                <input placeholder="Years (e.g. 2020 - Present)" value={exp.years} onChange={e => {
+                                                                                    const newExp = [...formData.experience];
+                                                                                    newExp[idx].years = e.target.value;
+                                                                                    updateFormData({ experience: newExp });
+                                                                                }} />
+                                                                            </div>
+                                                                            <textarea placeholder="Description of responsibilities..." value={exp.description} onChange={e => {
+                                                                                const newExp = [...formData.experience];
+                                                                                newExp[idx].description = e.target.value;
+                                                                                updateFormData({ experience: newExp });
+                                                                            }} />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                <button className="btn-secondary" style={{ width: '100%', gap: '8px' }} onClick={() => updateFormData({ experience: [...formData.experience, { company: '', position: '', years: '', description: '' }] })}>
+                                                                    <Plus size={16} /> Add Experience
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {section.id === 'projects' && (
+                                                            <div style={{ display: 'grid', gap: '20px' }}>
+                                                                {formData.projects.map((proj, idx) => (
+                                                                    <div key={idx} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: '12px', background: 'white', position: 'relative' }}>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const newProj = [...formData.projects];
+                                                                                newProj.splice(idx, 1);
+                                                                                updateFormData({ projects: newProj });
+                                                                            }}
+                                                                            style={{ position: 'absolute', top: '12px', right: '12px', color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                        >
+                                                                            <Trash2 size={14} />
+                                                                        </button>
+                                                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                                                            <input placeholder="Project Name" value={proj.name} onChange={e => {
+                                                                                const newProj = [...formData.projects];
+                                                                                newProj[idx].name = e.target.value;
+                                                                                updateFormData({ projects: newProj });
+                                                                            }} />
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-soft)', padding: '4px 12px', borderRadius: '8px' }}>
+                                                                                <Link size={14} color="var(--fg-muted)" />
+                                                                                <input placeholder="Project Link (URL)" style={{ background: 'none', border: 'none', padding: '8px 0' }} value={proj.link} onChange={e => {
+                                                                                    const newProj = [...formData.projects];
+                                                                                    newProj[idx].link = e.target.value;
+                                                                                    updateFormData({ projects: newProj });
+                                                                                }} />
+                                                                            </div>
+                                                                            <textarea placeholder="Tell us what you built..." value={proj.description} onChange={e => {
+                                                                                const newProj = [...formData.projects];
+                                                                                newProj[idx].description = e.target.value;
+                                                                                updateFormData({ projects: newProj });
+                                                                            }} />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                <button className="btn-secondary" style={{ width: '100%', gap: '8px' }} onClick={() => updateFormData({ projects: [...formData.projects, { name: '', link: '', description: '' }] })}>
+                                                                    <Plus size={16} /> Add Project
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {section.id === 'education' && (
+                                                            <div style={{ display: 'grid', gap: '20px' }}>
+                                                                {formData.education.map((edu, idx) => (
+                                                                    <div key={idx} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: '12px', background: 'white', position: 'relative' }}>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const newEdu = [...formData.education];
+                                                                                newEdu.splice(idx, 1);
+                                                                                updateFormData({ education: newEdu });
+                                                                            }}
+                                                                            style={{ position: 'absolute', top: '12px', right: '12px', color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                        >
+                                                                            <Trash2 size={14} />
+                                                                        </button>
+                                                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                                                            <input placeholder="Institution" value={edu.school} onChange={e => {
+                                                                                const newEdu = [...formData.education];
+                                                                                newEdu[idx].school = e.target.value;
+                                                                                updateFormData({ education: newEdu });
+                                                                            }} />
+                                                                            <input placeholder="Degree/Course" value={edu.degree} onChange={e => {
+                                                                                const newEdu = [...formData.education];
+                                                                                newEdu[idx].degree = e.target.value;
+                                                                                updateFormData({ education: newEdu });
+                                                                            }} />
+                                                                            <input placeholder="Year" value={edu.year} onChange={e => {
+                                                                                const newEdu = [...formData.education];
+                                                                                newEdu[idx].year = e.target.value;
+                                                                                updateFormData({ education: newEdu });
+                                                                            }} />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                <button className="btn-secondary" style={{ width: '100%', gap: '8px' }} onClick={() => updateFormData({ education: [...formData.education, { school: '', degree: '', year: '' }] })}>
+                                                                    <Plus size={16} /> Add Education
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {section.id === 'certificates' && (
+                                                            <div style={{ display: 'grid', gap: '20px' }}>
+                                                                {formData.certificates.map((cert, idx) => (
+                                                                    <div key={idx} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: '12px', background: 'white', position: 'relative' }}>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                const newCert = [...formData.certificates];
+                                                                                newCert.splice(idx, 1);
+                                                                                updateFormData({ certificates: newCert });
+                                                                            }}
+                                                                            style={{ position: 'absolute', top: '12px', right: '12px', color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                        >
+                                                                            <Trash2 size={14} />
+                                                                        </button>
+                                                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                                                            <input placeholder="Certification Name" value={cert.name} onChange={e => {
+                                                                                const newCert = [...formData.certificates];
+                                                                                newCert[idx].name = e.target.value;
+                                                                                updateFormData({ certificates: newCert });
+                                                                            }} />
+                                                                            <input placeholder="Issuing Organization" value={cert.issuer} onChange={e => {
+                                                                                const newCert = [...formData.certificates];
+                                                                                newCert[idx].issuer = e.target.value;
+                                                                                updateFormData({ certificates: newCert });
+                                                                            }} />
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-soft)', padding: '4px 12px', borderRadius: '8px' }}>
+                                                                                <Link size={14} color="var(--fg-muted)" />
+                                                                                <input placeholder="Credential Link" style={{ background: 'none', border: 'none', padding: '8px 0' }} value={cert.link} onChange={e => {
+                                                                                    const newCert = [...formData.certificates];
+                                                                                    newCert[idx].link = e.target.value;
+                                                                                    updateFormData({ certificates: newCert });
+                                                                                }} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                                <button className="btn-secondary" style={{ width: '100%', gap: '8px' }} onClick={() => updateFormData({ certificates: [...formData.certificates, { name: '', issuer: '', link: '' }] })}>
+                                                                    <Plus size={16} /> Add Certificate
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {section.id === 'skills' && (
+                                                            <div>
+                                                                <textarea rows={3} placeholder="Comma separated skills (e.g. React, Node.js, Architecture)" value={formData.skills} onChange={e => updateFormData({ skills: e.target.value })} />
                                                             </div>
                                                         )}
                                                     </div>

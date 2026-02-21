@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { templates } from '../templates/config';
+import { ArrowUpRight } from 'lucide-react';
 
 const TemplatePreview = ({ data }) => {
-    const { personalDetails = {}, summary = '', experience = [], education = [], skills = '', templateId, customColor, customBgColor } = data || {};
+    const { personalDetails = {}, summary = '', experience = [], education = [], skills = '', projects = [], certificates = [], templateId, customColor, customBgColor } = data || {};
 
     // Safety check for templates
     const template = templates?.find(t => t.id === templateId) || templates?.[0];
@@ -115,6 +116,34 @@ const TemplatePreview = ({ data }) => {
         // Minimal/Caps
         return <h3 style={{ ...baseStyle, letterSpacing: '0.2em', borderBottom: `1px solid ${accentColor}30`, paddingBottom: '4px' }}>{title}</h3>;
     };
+
+    const ProjectItem = ({ proj }) => (
+        <div style={{ marginBottom: '1.5em' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3em' }}>
+                <h4 style={{ fontWeight: 700, color: '#111827', fontSize: '1.05em' }}>{proj.name}</h4>
+                {proj.link && (
+                    <a href={proj.link.startsWith('http') ? proj.link : `https://${proj.link}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85em', color: accentColor, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        PROJECT <ArrowUpRight size={14} />
+                    </a>
+                )}
+            </div>
+            <p style={{ fontSize: '0.9em', lineHeight: '1.6', color: '#4B5563' }}>{proj.description}</p>
+        </div>
+    );
+
+    const CertificateItem = ({ cert }) => (
+        <div style={{ marginBottom: '1.2em' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.3em' }}>
+                <h4 style={{ fontWeight: 700, color: '#111827', fontSize: '1.05em' }}>{cert.name}</h4>
+                {cert.link && (
+                    <a href={cert.link.startsWith('http') ? cert.link : `https://${cert.link}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85em', color: accentColor, fontWeight: 600, textDecoration: 'none' }}>
+                        VERIFY
+                    </a>
+                )}
+            </div>
+            <div style={{ fontSize: '0.9em', fontWeight: 500, color: '#4B5563' }}>{cert.issuer}</div>
+        </div>
+    );
 
     // Header Styles
     const HeaderRenderer = () => {
@@ -358,6 +387,18 @@ const TemplatePreview = ({ data }) => {
                             </div>
                         ))}
                     </div>
+
+                    {certificates.length > 0 && (
+                        <div style={{ position: 'relative', zIndex: 1, marginTop: '2em', paddingLeft: styles.decor === 'accent-strip' ? '2.5em' : '0' }}>
+                            <h3 style={{ fontSize: '0.8em', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.5)', marginBottom: '1em', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '0.3em' }}>Certifications</h3>
+                            {certificates.map((cert, i) => (
+                                <div key={i} style={{ marginBottom: '1.2em' }}>
+                                    <div style={{ fontSize: '0.9em', fontWeight: 600, color: 'white' }}>{cert.name}</div>
+                                    <div style={{ fontSize: '0.8em', color: accentColor, fontWeight: 700 }}>{cert.issuer}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ padding: '3em 2.5em', background: 'white', position: 'relative', overflow: 'hidden', height: 'auto' }}>
@@ -374,6 +415,12 @@ const TemplatePreview = ({ data }) => {
                                 <SectionTitle title="Job Experience" />
                                 {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
                             </section>
+                            {projects.length > 0 && (
+                                <section style={{ position: 'relative', marginTop: '2.5em' }}>
+                                    <SectionTitle title="Key Projects" />
+                                    {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                                </section>
+                            )}
                         </div>
                     ) : (
                         <>
@@ -389,6 +436,12 @@ const TemplatePreview = ({ data }) => {
                                 <SectionTitle title="Experience" />
                                 {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
                             </section>
+                            {projects.length > 0 && (
+                                <section style={{ position: 'relative', marginTop: '2.5em' }}>
+                                    <SectionTitle title="Featured Projects" />
+                                    {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                                </section>
+                            )}
                             <section style={{ marginTop: '2.5em', position: 'relative' }}>
                                 <SectionTitle title="Education" />
                                 {education.map((edu, i) => (
@@ -433,10 +486,22 @@ const TemplatePreview = ({ data }) => {
                             </div>
                         ))}
                     </div>
+                    {certificates.length > 0 && (
+                        <div style={{ marginTop: '2.5em' }}>
+                            <SectionTitle title="Certifications" />
+                            {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                        </div>
+                    )}
                 </div>
                 <div>
                     <SectionTitle title="Experience" />
                     {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
+                    {projects.length > 0 && (
+                        <div style={{ marginTop: '2.5em' }}>
+                            <SectionTitle title="Projects" />
+                            {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -458,6 +523,12 @@ const TemplatePreview = ({ data }) => {
                     <div>
                         <SectionTitle title="Work History" />
                         {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
+                        {projects.length > 0 && (
+                            <div style={{ marginTop: '3em' }}>
+                                <SectionTitle title="Projects" />
+                                {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <div style={{ marginBottom: '3em' }}>
@@ -474,6 +545,12 @@ const TemplatePreview = ({ data }) => {
                                 </div>
                             ))}
                         </div>
+                        {certificates.length > 0 && (
+                            <div style={{ marginTop: '3em' }}>
+                                <SectionTitle title="Certifications" />
+                                {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -501,6 +578,20 @@ const TemplatePreview = ({ data }) => {
                     ))}
                 </div>
 
+                {projects.length > 0 && (
+                    <div style={{ marginBottom: '3.5em' }}>
+                        <h3 style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: '2em', color: '#111827', textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid #E5E7EB', paddingBottom: '0.6em' }}>Projects</h3>
+                        {projects.map((proj, i) => (
+                            <div key={i} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', marginBottom: '2.5em' }}>
+                                <span style={{ fontSize: '1.2em', display: 'flex', alignItems: 'center' }}>{proj.link ? '🔗' : '📁'}</span>
+                                <div>
+                                    <ProjectItem proj={proj} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <div style={{ marginBottom: '3.5em' }}>
                     <h3 style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: '2em', color: '#111827', textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid #E5E7EB', paddingBottom: '0.6em' }}>Education</h3>
                     {education.map((edu, i) => (
@@ -513,6 +604,20 @@ const TemplatePreview = ({ data }) => {
                         </div>
                     ))}
                 </div>
+
+                {certificates.length > 0 && (
+                    <div style={{ marginBottom: '3.5em' }}>
+                        <h3 style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: '2em', color: '#111827', textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid #E5E7EB', paddingBottom: '0.6em' }}>Certifications</h3>
+                        {certificates.map((cert, i) => (
+                            <div key={i} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', marginBottom: '1.5em' }}>
+                                <span style={{ fontSize: '1.2em' }}>📜</span>
+                                <div>
+                                    <CertificateItem cert={cert} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 <div style={{ marginBottom: '3.5em' }}>
                     <h3 style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: '2em', color: '#111827', textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid #E5E7EB', paddingBottom: '0.6em' }}>Skills</h3>
@@ -544,6 +649,13 @@ const TemplatePreview = ({ data }) => {
                     {experience.map((exp, i) => <ExperienceItem key={i} exp={exp} />)}
                 </section>
 
+                {projects.length > 0 && (
+                    <section style={{ marginBottom: '2.5em' }}>
+                        <SectionTitle title="Selected Projects" />
+                        {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                    </section>
+                )}
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3em' }}>
                     <section>
                         <SectionTitle title="Education" />
@@ -557,6 +669,12 @@ const TemplatePreview = ({ data }) => {
                     <section>
                         <SectionTitle title="Skills" />
                         <SkillsList />
+                        {certificates.length > 0 && (
+                            <div style={{ marginTop: '2.5em' }}>
+                                <SectionTitle title="Certifications" />
+                                {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                            </div>
+                        )}
                     </section>
                 </div>
             </div>
@@ -892,6 +1010,14 @@ const TemplatePreview = ({ data }) => {
                                 </div>
                             ))}
                         </div>
+                        {certificates.length > 0 && (
+                            <div style={{ marginBottom: '40px' }}>
+                                <h3 style={{ fontSize: '0.9em', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <span style={{ width: '20px', height: '2px', background: accentColor }}></span> Certifications
+                                </h3>
+                                {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                            </div>
+                        )}
                         <div style={{ marginBottom: '40px' }}>
                             <h3 style={{ fontSize: '0.9em', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <span style={{ width: '20px', height: '2px', background: accentColor }}></span> Skills
@@ -926,6 +1052,19 @@ const TemplatePreview = ({ data }) => {
                                 </div>
                             </div>
                         ))}
+
+                        {projects.length > 0 && (
+                            <div style={{ marginTop: '50px' }}>
+                                <h3 style={{ fontSize: '0.9em', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <span style={{ width: '20px', height: '2px', background: accentColor }}></span> Projects
+                                </h3>
+                                {projects.map((proj, i) => (
+                                    <div key={i} style={{ marginBottom: '35px', paddingLeft: '20px', borderLeft: `1px solid ${accentColor}40` }}>
+                                        <ProjectItem proj={proj} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -989,6 +1128,12 @@ const TemplatePreview = ({ data }) => {
                                 </div>
                             ))}
                         </section>
+                        {projects.length > 0 && (
+                            <section style={{ marginBottom: '50px' }}>
+                                <h3 style={{ fontSize: '1.1em', fontWeight: 800, textTransform: 'uppercase', marginBottom: '30px', borderLeft: `5px solid ${accentColor}`, paddingLeft: '15px' }}>Personal Projects</h3>
+                                {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                            </section>
+                        )}
                         <section>
                             <h3 style={{ fontSize: '1.1em', fontWeight: 800, textTransform: 'uppercase', marginBottom: '30px', borderLeft: `5px solid ${accentColor}`, paddingLeft: '15px' }}>Education</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -1001,6 +1146,12 @@ const TemplatePreview = ({ data }) => {
                                 ))}
                             </div>
                         </section>
+                        {certificates.length > 0 && (
+                            <section style={{ marginTop: '30px' }}>
+                                <h3 style={{ fontSize: '1.1em', fontWeight: 800, textTransform: 'uppercase', marginBottom: '30px', borderLeft: `5px solid ${accentColor}`, paddingLeft: '15px' }}>Awards & Certifications</h3>
+                                {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                            </section>
+                        )}
                     </div>
                 </div>
             </div>
@@ -1044,6 +1195,12 @@ const TemplatePreview = ({ data }) => {
                                     </div>
                                 ))}
                             </section>
+                            {certificates.length > 0 && (
+                                <section style={{ marginBottom: '50px' }}>
+                                    <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Certifications</h3>
+                                    {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                                </section>
+                            )}
                             <section>
                                 <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '20px', color: '#111827' }}>Expertise</h3>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
@@ -1068,6 +1225,12 @@ const TemplatePreview = ({ data }) => {
                                     </div>
                                 ))}
                             </section>
+                            {projects.length > 0 && (
+                                <section style={{ marginTop: '50px' }}>
+                                    <h3 style={{ fontSize: '1.5em', fontWeight: 700, textTransform: 'uppercase', marginBottom: '30px', color: '#111827' }}>Key Projects</h3>
+                                    {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                                </section>
+                            )}
                             {summary && (
                                 <section style={{ marginTop: '50px', padding: '30px', background: '#F3F4F6', borderLeft: `5px solid ${accentColor}` }}>
                                     <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '1.1em', fontStyle: 'italic', lineHeight: 1.6 }}>"{summary}"</p>
@@ -1114,6 +1277,12 @@ const TemplatePreview = ({ data }) => {
                             </div>
                         ))}
                     </section>
+                    {projects.length > 0 && (
+                        <section style={{ marginBottom: '60px' }}>
+                            <h3 style={{ fontSize: '1.5em', fontWeight: 800, marginBottom: '40px', color: '#1E293B', borderBottom: `4px solid ${accentColor}`, display: 'inline-block' }}>Projects</h3>
+                            {projects.map((proj, i) => <ProjectItem key={i} proj={proj} />)}
+                        </section>
+                    )}
                     <section>
                         <h3 style={{ fontSize: '1.5em', fontWeight: 800, marginBottom: '40px', color: '#1E293B', borderBottom: `4px solid ${accentColor}`, display: 'inline-block' }}>Education</h3>
                         {education.map((edu, i) => (
@@ -1123,6 +1292,12 @@ const TemplatePreview = ({ data }) => {
                             </div>
                         ))}
                     </section>
+                    {certificates.length > 0 && (
+                        <section style={{ marginTop: '40px' }}>
+                            <h3 style={{ fontSize: '1.5em', fontWeight: 800, marginBottom: '40px', color: '#1E293B', borderBottom: `4px solid ${accentColor}`, display: 'inline-block' }}>Certifications</h3>
+                            {certificates.map((cert, i) => <CertificateItem key={i} cert={cert} />)}
+                        </section>
+                    )}
                 </div>
             </div>
         );
