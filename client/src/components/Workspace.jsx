@@ -24,7 +24,7 @@ import {
     Award
 } from 'lucide-react';
 import TemplatePreview from './TemplatePreview';
-// import JobHub from './JobHub'; // Removed Job Hub
+import JobHub from './JobHub';
 import { templates, fontOptions } from '../templates/config';
 import { calculateATSScore } from '../utils/atsAnalyzer';
 import ErrorBoundary from './ErrorBoundary';
@@ -156,7 +156,8 @@ const Workspace = ({ setView }) => {
                     {[
                         { id: 'content', icon: FileText, label: 'Content' },
                         { id: 'design', icon: Palette, label: 'Design' },
-                        { id: 'vault', icon: Settings, label: 'Vault' }
+                        { id: 'vault', icon: Settings, label: 'Vault' },
+                        { id: 'jobs', icon: Briefcase, label: 'Job Hub' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -189,6 +190,7 @@ const Workspace = ({ setView }) => {
                             {activeTab === 'content' && 'Resume Content'}
                             {activeTab === 'design' && 'Design Center'}
                             {activeTab === 'vault' && 'Career Vault'}
+                            {activeTab === 'jobs' && 'Job Hub'}
                         </h2>
                         <button
                             className="btn-primary"
@@ -410,6 +412,12 @@ const Workspace = ({ setView }) => {
                                 <button className="btn-secondary" style={{ padding: '16px', borderRadius: '16px', borderStyle: 'dashed', marginTop: '12px' }} onClick={() => setView('templates')}>
                                     <Plus size={16} /> INITIALIZE NEW ASSET
                                 </button>
+                            </div>
+                        )}
+
+                        {activeTab === 'jobs' && (
+                            <div style={{ height: '100%' }}>
+                                <JobHub isEmbedded={true} />
                             </div>
                         )}
                     </div>

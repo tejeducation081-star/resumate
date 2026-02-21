@@ -610,15 +610,15 @@ const LandingPage = ({ setView }) => {
                             <span style={{ color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.1em' }}>ALL-IN-ONE CAREER SUITE</span>
                             <h2 style={{ fontSize: '3rem', margin: '1rem 0 2rem 0' }}>The Ultimate <span className="text-gradient">Toolkit.</span></h2>
                             <p style={{ color: 'var(--fg-muted)', fontSize: '1.1rem', lineHeight: 1.8, marginBottom: '2.5rem' }}>
-                                Dominate the job market with our integrated ecosystem. From architectural resume design to neural keyword optimization, we've engineered every tool you need to land your next elite role.
+                                Dominate the job market with our integrated ecosystem. From architectural resume design to live global job hunting, we've engineered every tool you need to land your next elite role.
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {[
-                                    "One-Click LinkedIn Profile Optimization",
+                                    "Live Job Board (Naukri, Indeed & more)",
                                     "ATS-Level Power Checker Engine",
                                     "Instant Resume Creation & PDF Download",
                                     "25+ Premium Architectural Templates",
-                                    "Neural Keyword Suggestion System"
+                                    "Direct Naukri & Indeed Job Facilities"
                                 ].map(feat => (
                                     <div key={feat} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{ color: 'var(--accent)' }}><CheckCircle size={20} /></div>
@@ -664,7 +664,7 @@ const LandingPage = ({ setView }) => {
                             { q: "How do I get my Premium Credentials?", a: "Once you purchase premium, our administrator will verify the transaction and manually issue your unique credentials (ID/Password). This manual audit ensures every user receives personalized onboarding." },
                             { q: "Is the ATS Power Score really different?", a: "Yes. Most checkers only look for keywords. Our Neural Engine analyzes Flesch-Kincaid readability, recursive parsing pathways, and hidden character contamination to ensure enterprise-grade compatibility." },
                             { q: "Can I manage multiple architectures?", a: "Absolutely. Premium users can maintain a matrix of resume versions, each architecture precisely tuned for different industries or platforms." },
-                            { q: "Is the ATS Checker always up to date?", a: "Yes. Our neural weightings are updated weekly to match the evolving algorithms of major enterprise hiring platforms like Workday, Greenhouse, and Taleo." }
+                            { q: "What does 'Direct Global Sync' mean?", a: "It means you don't download and upload. You finalize your design in Resumate, click Sync, and we push the data directly into your Naukri and Indeed profiles via our secure API pipes." }
                         ].map((faq, i) => (
                             <motion.div
                                 key={i}

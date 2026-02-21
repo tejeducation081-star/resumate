@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import TemplateGallery from './components/TemplateGallery';
 import AdminPanel from './components/AdminPanel';
 import SplashScreen from './components/SplashScreen';
-// import JobsPage from './components/JobsPage'; // Removed Job Hub
+import JobsPage from './components/JobsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
@@ -69,6 +69,11 @@ function App() {
                         {view === 'editor' && <Workspace setView={setView} />}
                         {view === 'profile' && <MasterProfile setView={setView} />}
                         {view === 'templates' && <TemplateGallery setView={setView} />}
+                        {view === 'jobs' && (
+                            <ErrorBoundary>
+                                <JobsPage setView={setView} />
+                            </ErrorBoundary>
+                        )}
 
                         {view === 'privacy' && <PrivacyPolicy />}
                         {view === 'terms' && <TermsOfService />}
