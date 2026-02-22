@@ -40,7 +40,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Workspace = ({ setView }) => {
     const { currentResume, saveResume, resumes, fetchResumes, setCurrentResume } = useResumeStore();
     const { user } = useAuthStore();
-    const { profile } = useProfileStore();
+    const { profile, fetchProfile } = useProfileStore();
 
     const [activeTab, setActiveTab] = useState('content'); // 'content', 'design', 'vault', 'jobs'
     const [activeSection, setActiveSection] = useState(null); // For progressive disclosure in content tab
@@ -50,7 +50,7 @@ const Workspace = ({ setView }) => {
             fullName: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
             email: user?.email || '',
             phone: '',
-            location: '',
+            location: profile?.location || '',
             website: '',
             jobTitle: profile?.title || '',
             photoUrl: ''
@@ -78,7 +78,8 @@ const Workspace = ({ setView }) => {
 
     useEffect(() => {
         fetchResumes();
-    }, [fetchResumes]);
+        fetchProfile();
+    }, [fetchResumes, fetchProfile]);
 
     useEffect(() => {
         const calculateScale = () => {
@@ -165,8 +166,7 @@ const Workspace = ({ setView }) => {
                     {[
                         { id: 'content', icon: FileText, label: 'Content' },
                         { id: 'design', icon: Palette, label: 'Design' },
-                        { id: 'vault', icon: Settings, label: 'Vault' },
-                        { id: 'jobs', icon: Briefcase, label: 'Job Hub' }
+                        { id: 'vault', icon: Settings, label: 'Vault' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -199,7 +199,6 @@ const Workspace = ({ setView }) => {
                             {activeTab === 'content' && 'Resume Content'}
                             {activeTab === 'design' && 'Design Center'}
                             {activeTab === 'vault' && 'Career Vault'}
-                            {activeTab === 'jobs' && 'Job Hub'}
                         </h2>
                         <button
                             className="btn-primary"
@@ -710,11 +709,7 @@ const Workspace = ({ setView }) => {
                             </div>
                         )}
 
-                        {activeTab === 'jobs' && (
-                            <div style={{ height: '100%' }}>
-                                <JobHub isEmbedded={true} />
-                            </div>
-                        )}
+
                     </div>
                 </div>
             </aside >

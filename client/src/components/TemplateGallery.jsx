@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, Palette, X, Layout, Lock, Sparkles } from 'lucide-react';
 import useResumeStore from '../store/resumeStore';
 import useAuthStore from '../store/authStore';
+import useProfileStore from '../store/profileStore';
 import TemplatePreview from './TemplatePreview';
 import PremiumModal from './PremiumModal';
 import { sampleResume } from '../data/sampleResume';
@@ -61,7 +62,12 @@ const TemplateGallery = ({ setView }) => {
         '#1F1F1F', '#2F2F2F', '#3F3F3F', '#1A1A2E'  // Very dark tones
     ];
 
-    const { setCurrentResume, setIsPreviewing } = useResumeStore();
+    const { setCurrentResume, setIsPreviewing, saveResume } = useResumeStore();
+    const { profile, fetchProfile } = useProfileStore();
+
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     const handleTemplateClick = (template) => {
         setSelectedTemplate(template);
@@ -72,29 +78,48 @@ const TemplateGallery = ({ setView }) => {
         setCustomFontSize(14);
     };
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         if (!selectedTemplate) return;
 
-        setCurrentResume({
-            personalDetails: { fullName: '', email: '', phone: '', location: '', website: '', jobTitle: '', photoUrl: '' },
-            summary: '',
+        const resumeData = {
+            personalDetails: {
+                fullName: user?.user_metadata?.fullName || user?.user_metadata?.username || user?.email?.split('@')[0] || '',
+                email: user?.email || '',
+                phone: '',
+                location: profile?.location || '',
+                website: '',
+                jobTitle: profile?.title || '',
+                photoUrl: ''
+            },
+            summary: profile?.bio || '',
             experience: [],
             education: [],
-            skills: '',
+            skills: Array.isArray(profile?.skills) ? profile.skills.join(', ') : profile?.skills || '',
             templateId: selectedTemplate.id,
             customColor: selectedColor,
             customBgColor: selectedBgColor,
             customFontFamily,
             customFontSize
-        });
+        };
 
         if (!user) {
+            setCurrentResume(resumeData);
             setIsPremiumModalOpen(true);
             return;
         }
 
-        setView('editor');
-        setIsPreviewing(false); // Restore Navbar state for editor (or let editor handle it)
+        try {
+            const savedResume = await saveResume(resumeData);
+            setCurrentResume(savedResume);
+            setView('editor');
+            setIsPreviewing(false);
+        } catch (err) {
+            console.error('Auto-save error:', err);
+            // Fallback to local state if server save fails
+            setCurrentResume(resumeData);
+            setView('editor');
+            setIsPreviewing(false);
+        }
     };
 
     return (

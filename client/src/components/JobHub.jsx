@@ -34,11 +34,12 @@ const JobHub = ({ isEmbedded = false }) => {
     // Search state
     const [query, setQuery] = useState('Software Engineer');
     const [location, setLocation] = useState('Bangalore');
+    const [jobType, setJobType] = useState('');
 
     const fetchJobs = useCallback(async () => {
         setLoading(true);
         try {
-            const params = new URLSearchParams({ query, location, limit: 12 });
+            const params = new URLSearchParams({ query, location, jobType, limit: 12 });
             const res = await fetch(`${API_ENDPOINTS.SEARCH_JOBS}?${params}`);
             const data = await res.json();
             if (data.success) {
@@ -49,7 +50,7 @@ const JobHub = ({ isEmbedded = false }) => {
         } finally {
             setLoading(false);
         }
-    }, [query, location]);
+    }, [query, location, jobType]);
 
     useEffect(() => {
         fetchJobs();
@@ -117,6 +118,29 @@ const JobHub = ({ isEmbedded = false }) => {
                             onChange={e => setLocation(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && fetchJobs()}
                         />
+                    </div>
+                    <div style={{ flex: 1, position: 'relative' }}>
+                        <Clock size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--fg-muted)' }} />
+                        <select
+                            style={{
+                                width: '100%',
+                                padding: '12px 12px 12px 48px',
+                                border: 'none',
+                                background: 'var(--bg-soft)',
+                                borderRadius: '8px',
+                                appearance: 'none',
+                                cursor: 'pointer',
+                                color: 'var(--fg)',
+                                height: '100%'
+                            }}
+                            value={jobType}
+                            onChange={e => setJobType(e.target.value)}
+                        >
+                            <option value="">All Types</option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Contract">Contract</option>
+                        </select>
                     </div>
                     <button className="btn-primary" onClick={fetchJobs} style={{ padding: '0 24px' }}>Search</button>
                 </div>

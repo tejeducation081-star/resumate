@@ -21,6 +21,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
     const [selectedJob, setSelectedJob] = useState(null);
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [locationInput, setLocationInput] = useState(location);
+    const [jobType, setJobType] = useState('');
     const [platforms, setPlatforms] = useState([]);
 
     const fetchPlatforms = async (q = searchInput, l = locationInput) => {
@@ -34,7 +35,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
 
     useEffect(() => {
         if (isOpen) {
-            handleSearch(searchInput, locationInput);
+            handleSearch(searchInput, locationInput, jobType);
             fetchPlatforms(searchInput, locationInput);
         }
     }, [isOpen]);
@@ -44,13 +45,13 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
         if (!isOpen) return;
 
         const refreshInterval = setInterval(() => {
-            handleSearch(searchInput, locationInput);
+            handleSearch(searchInput, locationInput, jobType);
         }, 5 * 60 * 1000); // 5 minutes
 
         return () => clearInterval(refreshInterval);
-    }, [isOpen, searchInput, locationInput]);
+    }, [isOpen, searchInput, locationInput, jobType]);
 
-    const handleSearch = async (query = searchInput, loc = locationInput) => {
+    const handleSearch = async (query = searchInput, loc = locationInput, type = jobType) => {
         if (!query.trim()) {
             setError('Please enter a job title or skill');
             return;
@@ -64,6 +65,7 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
             const params = new URLSearchParams({
                 query: query.trim(),
                 location: loc.trim(),
+                jobType: type,
                 limit: 20
             });
 
@@ -218,6 +220,33 @@ const JobSearch = ({ isOpen, onClose, searchQuery = '', location = '' }) => {
                                     {COMMON_LOCATIONS.map(loc => (
                                         <option key={loc.value} value={loc.value}>{loc.label}</option>
                                     ))}
+                                </select>
+                                <ChevronDown size={14} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--fg-muted)', pointerEvents: 'none' }} />
+                            </div>
+                        </div>
+                        <div style={{ position: 'relative' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Job Type</label>
+                            <div style={{ position: 'relative', marginTop: '0.5rem' }}>
+                                <select
+                                    value={jobType}
+                                    onChange={(e) => setJobType(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        border: '1px solid var(--border)',
+                                        borderRadius: '8px',
+                                        background: 'var(--bg)',
+                                        color: 'var(--fg)',
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        appearance: 'none',
+                                        WebkitAppearance: 'none'
+                                    }}
+                                >
+                                    <option value="">All Types</option>
+                                    <option value="Full-time">Full-time</option>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Contract">Contract</option>
                                 </select>
                                 <ChevronDown size={14} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--fg-muted)', pointerEvents: 'none' }} />
                             </div>

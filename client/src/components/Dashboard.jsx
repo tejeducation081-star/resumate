@@ -139,6 +139,13 @@ const Dashboard = ({ setView }) => {
             icon: TrendingUp,
             color: '#10B981',
             progress: resumes.length > 0 ? Math.max(...resumes.map(r => calculateATSScore(r).score)) : 0
+        },
+        {
+            label: 'Market Intelligence',
+            value: 'Job Hub',
+            icon: Briefcase,
+            color: '#6366F1',
+            onClick: () => setView('jobs')
         }
     ];
 
@@ -181,6 +188,7 @@ const Dashboard = ({ setView }) => {
                         <motion.div
                             key={idx}
                             whileHover={{ y: -4, background: 'var(--surface-highlight)' }}
+                            onClick={stat.onClick}
                             className="glass-panel"
                             style={{
                                 padding: '1.25rem',
@@ -188,7 +196,8 @@ const Dashboard = ({ setView }) => {
                                 alignItems: 'center',
                                 gap: '1.25rem',
                                 borderRadius: '20px',
-                                minHeight: '100px'
+                                minHeight: '100px',
+                                cursor: stat.onClick ? 'pointer' : 'default'
                             }}
                         >
                             <div style={{
@@ -205,13 +214,15 @@ const Dashboard = ({ setView }) => {
                             <div style={{ flex: 1 }}>
                                 <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--fg-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>{stat.label}</div>
                                 <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--fg)', lineHeight: 1 }}>{stat.value}</div>
-                                <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', marginTop: '0.5rem' }}>
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${stat.progress}%` }}
-                                        style={{ height: '100%', background: stat.color }}
-                                    />
-                                </div>
+                                {stat.progress !== undefined && (
+                                    <div style={{ height: '4px', width: '100%', background: 'var(--bg-soft)', borderRadius: '2px', overflow: 'hidden', marginTop: '0.5rem' }}>
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${stat.progress}%` }}
+                                            style={{ height: '100%', background: stat.color }}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     ))}
